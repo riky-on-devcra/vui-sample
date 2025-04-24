@@ -60,7 +60,16 @@ export default function InteractiveCurveBlend() {
   const [graph1EndColorB, setGraph1EndColorB] = useState("#3C97E9");
 
   const steps = 20;
-  const xRange: [number, number] = [0, window.innerWidth];
+  const [windowWidth, setWindowWidth] = useState(800);
+
+  React.useEffect(() => {
+    const updateWidth = () => setWindowWidth(window.innerWidth);
+    updateWidth();
+    window.addEventListener("resize", updateWidth);
+    return () => window.removeEventListener("resize", updateWidth);
+  }, []);
+
+  const xRange: [number, number] = [0, windowWidth];
   const resolution = 60;
 
   const curveA = generatePointsFromFn(
@@ -168,7 +177,7 @@ export default function InteractiveCurveBlend() {
   return (
     <div className="relative w-full h-full">
       <div className="fixed top-0 left-0 text-xs flex flex-wrap gap-4 p-4">
-        <div>
+        <div className="flex flex-col gap-2 w-full max-w-[800px]">
           Graph 1
           <div className="grid grid-cols-4 gap-2">
             <div>
@@ -196,7 +205,7 @@ export default function InteractiveCurveBlend() {
                 type="range"
                 value={graph1PhaseA}
                 readOnly
-                className="w-full"
+                className="w-full accent-gray-800 cursor-not-allowed"
               />
             </div>
             <div>
@@ -224,7 +233,7 @@ export default function InteractiveCurveBlend() {
                 type="range"
                 value={graph1PhaseB}
                 readOnly
-                className="w-full"
+                className="w-full accent-gray-800 cursor-not-allowed"
               />
             </div>
           </div>
@@ -263,7 +272,7 @@ export default function InteractiveCurveBlend() {
             </div>
           </div>
         </div>
-        <div>
+        <div className="flex flex-col gap-2 w-full max-w-[800px]">
           Graph 2
           <div>
             <div className="grid grid-cols-4 gap-2">
@@ -292,7 +301,7 @@ export default function InteractiveCurveBlend() {
                   type="range"
                   value={graph2PhaseA}
                   readOnly
-                  className="w-full"
+                  className="w-full accent-gray-800 cursor-not-allowed"
                 />
               </div>
               <div>
@@ -320,7 +329,7 @@ export default function InteractiveCurveBlend() {
                   type="range"
                   value={graph2PhaseB}
                   readOnly
-                  className="w-full"
+                  className="w-full accent-gray-800 cursor-not-allowed"
                 />
               </div>
             </div>
@@ -362,7 +371,7 @@ export default function InteractiveCurveBlend() {
         </div>
       </div>
       <div className="flex items-end w-full h-full p-2">
-        <svg className="w-full aspect-square border border-gray-300 bg-white">
+        <svg className="w-full aspect-square border max-h-[75vh] border-gray-300 bg-white">
           <defs>{gradients}</defs>
           {paths}
         </svg>
