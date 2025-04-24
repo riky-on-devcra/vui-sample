@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import * as d3 from "d3";
 
+// 주어진 수학 함수 fn과 x 범위, steps를 기반으로 곡선을 구성할 좌표 배열을 생성하는 함수
 const generatePointsFromFn = (
   fn: (x: number) => number,
   xRange: [number, number],
@@ -10,6 +11,7 @@ const generatePointsFromFn = (
   const [xStart, xEnd] = xRange;
   const points: [number, number][] = [];
 
+  // 그래프1(A→B), 그래프2(C→D) 각각에 대해 보간 곡선을 steps 개수만큼 생성하고 색상도 함께 보간하여 paths와 gradients 배열에 저장
   for (let i = 0; i <= steps; i++) {
     const x = xStart + ((xEnd - xStart) * i) / steps;
     const y = fn(x);
@@ -19,6 +21,7 @@ const generatePointsFromFn = (
   return points;
 };
 
+// 두 곡선의 각 점을 보간하여 중간 곡선을 생성하는 함수
 const interpolatePoints = (
   a: [number, number][],
   b: [number, number][],
@@ -30,16 +33,15 @@ const interpolatePoints = (
   });
 };
 
+// 주어진 좌표 배열을 d3의 line 생성기로 path 문자열로 변환하는 함수
 const generatePath = (points: [number, number][]) =>
   d3.line<[number, number]>().curve(d3.curveBasis)(points)!;
 
 export default function InteractiveCurveBlend() {
   const [graph1AmpA, setGraph1AmpA] = useState(60);
   const [graph1PhaseA, setGraph1PhaseA] = useState(-2.4);
-  // Removed duplicate declaration of graph1PhaseB
-  // Removed duplicate declaration of graph2PhaseA
-  // Removed duplicate declaration of graph2PhaseB
 
+  // 그래프의 위상(phase)을 시간에 따라 주기적으로 갱신하여 애니메이션을 생성하는 useEffect
   React.useEffect(() => {
     const interval = setInterval(() => {
       // 그래프 1 빠르게
@@ -59,6 +61,7 @@ export default function InteractiveCurveBlend() {
   const [graph1StartColorB, setGraph1StartColorB] = useState("#C09BFF");
   const [graph1EndColorB, setGraph1EndColorB] = useState("#3C97E9");
 
+  // 그래프 보간 단계 수: 곡선 A→B, C→D 간의 중간 곡선을 얼마나 촘촘하게 그릴지 결정 (높을수록 부드러움)
   const steps = 20;
   const [windowWidth, setWindowWidth] = useState(800);
 
@@ -70,19 +73,20 @@ export default function InteractiveCurveBlend() {
   }, []);
 
   const xRange: [number, number] = [0, windowWidth];
+  // 곡선을 몇 개의 점으로 구성할지 결정하는 값 (높을수록 세밀한 곡선)
   const resolution = 60;
 
   const curveA = generatePointsFromFn(
     (x) => 250 + graph1AmpA * Math.sin((x + 0) / 80 + graph1PhaseA),
     xRange,
     resolution
-  );
+  ); // 중심 y값: 250, 진폭: graph1AmpA, 위상: graph1PhaseA,
 
   const curveB = generatePointsFromFn(
     (x) => 260 + graph1AmpB * Math.sin((x + 20) / 80 + graph1PhaseB),
     xRange,
     resolution
-  );
+  ); // 중심 y값: 260, 진폭: graph1AmpB, 위상: graph1PhaseB,
 
   const paths = [];
   const gradients = [];
@@ -100,13 +104,13 @@ export default function InteractiveCurveBlend() {
     (x) => 240 + graph2AmpA * Math.sin((x + 10) / 80 + graph2PhaseA),
     xRange,
     resolution
-  );
+  ); // 중심 y값: 240, 진폭: graph2AmpA, 위상: graph2PhaseA,
 
   const curveD = generatePointsFromFn(
     (x) => 270 + graph2AmpB * Math.sin((x + 30) / 80 + graph2PhaseB),
     xRange,
     resolution
-  );
+  ); // 중심 y값: 270, 진폭: graph2AmpB, 위상: graph2PhaseB,
   for (let i = 0; i <= steps; i++) {
     const t = i / steps;
     const blended = interpolatePoints(curveA, curveB, t);
