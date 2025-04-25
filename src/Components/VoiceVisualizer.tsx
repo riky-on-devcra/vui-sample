@@ -39,23 +39,14 @@ const generatePath = (points: [number, number][]) =>
 
 export default function InteractiveCurveBlend() {
   const [graph1AmpA, setGraph1AmpA] = useState(60);
-  const [graph1PhaseA, setGraph1PhaseA] = useState(-2.4);
+  const [graph1PhaseA, setGraph1PhaseA] = useState(
+    (-2.4 + Math.PI * 2) % (Math.PI * 2)
+  ); // ≈ 3.88
 
-  // 그래프의 위상(phase)을 시간에 따라 주기적으로 갱신하여 애니메이션을 생성하는 useEffect
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      // 그래프 1 빠르게
-      setGraph1PhaseA((prev) => prev + 0.02);
-      setGraph1PhaseB((prev) => prev - 0.03);
+  // 음수 값들을 % (Math.PI * 2) 연산을 사용하여 0~2π 범위로 변환
 
-      // 그래프 2는 더 빠르고 역방향 강조
-      setGraph2PhaseA((prev) => prev - 0.035);
-      setGraph2PhaseB((prev) => prev + 0.05);
-    }, 20); // 간격도 더 짧게
-    return () => clearInterval(interval);
-  }, []);
   const [graph1AmpB, setGraph1AmpB] = useState(55);
-  const [graph1PhaseB, setGraph1PhaseB] = useState(0.2);
+  const [graph1PhaseB, setGraph1PhaseB] = useState(0.2 % (Math.PI * 2)); // = 0.2
   const [graph1StartColorA, setGraph1StartColorA] = useState("#DDC1FE");
   const [graph1EndColorA, setGraph1EndColorA] = useState("#7ACBFF");
   const [graph1StartColorB, setGraph1StartColorB] = useState("#C09BFF");
@@ -76,41 +67,103 @@ export default function InteractiveCurveBlend() {
   // 곡선을 몇 개의 점으로 구성할지 결정하는 값 (높을수록 세밀한 곡선)
   const resolution = 60;
 
+  // 화면 크기에 따른 스케일 팩터 계산 (기준 너비를 800으로 가정)
+  const scaleFactor = windowWidth / 800;
+
+  // 기준 중심점을 250으로 통일하고 offset으로 조절
+  const centerY = 100;
   const curveA = generatePointsFromFn(
-    (x) => 250 + graph1AmpA * Math.sin((x + 0) / 80 + graph1PhaseA),
+    (x) =>
+      centerY * scaleFactor + // 기준 중심점
+      graph1AmpA *
+        scaleFactor *
+        Math.sin((x + 0) / (80 * scaleFactor) + graph1PhaseA),
     xRange,
     resolution
-  ); // 중심 y값: 250, 진폭: graph1AmpA, 위상: graph1PhaseA,
+  );
 
   const curveB = generatePointsFromFn(
-    (x) => 260 + graph1AmpB * Math.sin((x + 20) / 80 + graph1PhaseB),
+    (x) =>
+      (centerY + 10) * scaleFactor + // offset: +10
+      graph1AmpB *
+        scaleFactor *
+        Math.sin((x + 20) / (80 * scaleFactor) + graph1PhaseB),
     xRange,
     resolution
-  ); // 중심 y값: 260, 진폭: graph1AmpB, 위상: graph1PhaseB,
+  );
 
   const paths = [];
   const gradients = [];
 
   const [graph2AmpA, setGraph2AmpA] = useState(40);
-  const [graph2PhaseA, setGraph2PhaseA] = useState(-1.0);
+  const [graph2PhaseA, setGraph2PhaseA] = useState(
+    (-1.0 + Math.PI * 2) % (Math.PI * 2)
+  ); // ≈ 5.28
   const [graph2AmpB, setGraph2AmpB] = useState(65);
-  const [graph2PhaseB, setGraph2PhaseB] = useState(0.8);
+  const [graph2PhaseB, setGraph2PhaseB] = useState(0.8 % (Math.PI * 2)); // = 0.8
   const [graph2StartColorA, setGraph2StartColorA] = useState("#C09BFF");
   const [graph2EndColorA, setGraph2EndColorA] = useState("#3C44E9");
   const [graph2StartColorB, setGraph2StartColorB] = useState("#F6DCFF");
   const [graph2EndColorB, setGraph2EndColorB] = useState("#AEBFFF");
 
   const curveC = generatePointsFromFn(
-    (x) => 240 + graph2AmpA * Math.sin((x + 10) / 80 + graph2PhaseA),
+    (x) =>
+      (centerY - 10) * scaleFactor + // offset: -10
+      graph2AmpA *
+        scaleFactor *
+        Math.sin((x + 10) / (80 * scaleFactor) + graph2PhaseA),
     xRange,
     resolution
-  ); // 중심 y값: 240, 진폭: graph2AmpA, 위상: graph2PhaseA,
+  );
 
   const curveD = generatePointsFromFn(
-    (x) => 270 + graph2AmpB * Math.sin((x + 30) / 80 + graph2PhaseB),
+    (x) =>
+      (centerY + 20) * scaleFactor + // offset: +20
+      graph2AmpB *
+        scaleFactor *
+        Math.sin((x + 30) / (80 * scaleFactor) + graph2PhaseB),
     xRange,
     resolution
-  ); // 중심 y값: 270, 진폭: graph2AmpB, 위상: graph2PhaseB,
+  );
+
+  // 그래프의 위상(phase)을 시간에 따라 주기적으로 갱신하여 애니메이션을 생성하는 useEffect
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      const graph1PhaseA_diff = 0.02;
+      const graph1PhaseB_diff = -0.03;
+      const graph2PhaseA_diff = -0.035;
+      const graph2PhaseB_diff = 0.05;
+
+      setGraph1PhaseA((prev) => {
+        const next = prev + graph1PhaseA_diff;
+        if (next >= Math.PI * 2) return 0;
+        if (next < 0) return Math.PI * 2;
+        return next;
+      });
+
+      setGraph1PhaseB((prev) => {
+        const next = prev + graph1PhaseB_diff;
+        if (next >= Math.PI * 2) return 0;
+        if (next < 0) return Math.PI * 2;
+        return next;
+      });
+
+      setGraph2PhaseA((prev) => {
+        const next = prev + graph2PhaseA_diff;
+        if (next >= Math.PI * 2) return 0;
+        if (next < 0) return Math.PI * 2;
+        return next;
+      });
+
+      setGraph2PhaseB((prev) => {
+        const next = prev + graph2PhaseB_diff;
+        if (next >= Math.PI * 2) return 0;
+        if (next < 0) return Math.PI * 2;
+        return next;
+      });
+    }, 20);
+    return () => clearInterval(interval);
+  }, []);
   for (let i = 0; i <= steps; i++) {
     const t = i / steps;
     const blended = interpolatePoints(curveA, curveB, t);
@@ -208,6 +261,9 @@ export default function InteractiveCurveBlend() {
               <input
                 type="range"
                 value={graph1PhaseA}
+                min={0}
+                max={Math.PI * 2}
+                step={0.01}
                 readOnly
                 className="w-full accent-gray-800 cursor-not-allowed"
               />
@@ -237,6 +293,9 @@ export default function InteractiveCurveBlend() {
                 type="range"
                 value={graph1PhaseB}
                 readOnly
+                min={0}
+                max={Math.PI * 2}
+                step={0.01}
                 className="w-full accent-gray-800 cursor-not-allowed"
               />
             </div>
@@ -305,6 +364,9 @@ export default function InteractiveCurveBlend() {
                   type="range"
                   value={graph2PhaseA}
                   readOnly
+                  min={0}
+                  max={Math.PI * 2}
+                  step={0.01}
                   className="w-full accent-gray-800 cursor-not-allowed"
                 />
               </div>
@@ -333,6 +395,9 @@ export default function InteractiveCurveBlend() {
                   type="range"
                   value={graph2PhaseB}
                   readOnly
+                  min={0}
+                  max={Math.PI * 2}
+                  step={0.01}
                   className="w-full accent-gray-800 cursor-not-allowed"
                 />
               </div>
@@ -375,7 +440,7 @@ export default function InteractiveCurveBlend() {
         </div>
       </div>
       <div className="flex items-end w-full h-full p-2">
-        <svg className="w-full aspect-square border max-h-[75vh] border-gray-300 bg-white">
+        <svg className="w-full aspect-square border max-h-[60vh] border-gray-300 bg-white">
           <defs>{gradients}</defs>
           {paths}
         </svg>
