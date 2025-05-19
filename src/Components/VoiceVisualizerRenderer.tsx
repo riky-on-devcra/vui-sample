@@ -146,6 +146,46 @@ export default function VoiceVisualizerRenderer({
   );
 
   // 그래프의 위상(phase)을 시간에 따라 주기적으로 갱신하여 애니메이션을 생성하는 useEffect
+
+  // 그래프의 위상(phase)을 시간에 따라 주기적으로 갱신하여 애니메이션을 생성하는 useEffect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const graph1PhaseA_diff = 0.02;
+      const graph1PhaseB_diff = -0.03;
+      const graph2PhaseA_diff = -0.035;
+      const graph2PhaseB_diff = 0.05;
+
+      setGraph1PhaseA((prev) => {
+        const next = prev + graph1PhaseA_diff;
+        if (next >= Math.PI * 2) return 0;
+        if (next < 0) return Math.PI * 2;
+        return next;
+      });
+
+      setGraph1PhaseB((prev) => {
+        const next = prev + graph1PhaseB_diff;
+        if (next >= Math.PI * 2) return 0;
+        if (next < 0) return Math.PI * 2;
+        return next;
+      });
+
+      setGraph2PhaseA((prev) => {
+        const next = prev + graph2PhaseA_diff;
+        if (next >= Math.PI * 2) return 0;
+        if (next < 0) return Math.PI * 2;
+        return next;
+      });
+
+      setGraph2PhaseB((prev) => {
+        const next = prev + graph2PhaseB_diff;
+        if (next >= Math.PI * 2) return 0;
+        if (next < 0) return Math.PI * 2;
+        return next;
+      });
+    }, 20);
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     const updateAudioVisualization = () => {
       if (
@@ -312,7 +352,13 @@ export default function VoiceVisualizerRenderer({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [isRecording, isInitialized, analyserRef, audioContextRef]);
+  }, [
+    isRecording,
+    isInitialized,
+    analyserRef,
+    audioContextRef,
+    animationFrameRef,
+  ]);
 
   for (let i = 0; i <= steps; i++) {
     const t = i / steps;
@@ -383,7 +429,7 @@ export default function VoiceVisualizerRenderer({
 
   return (
     <div className="relative w-full h-full">
-      <div className="fixed top-0 left-0 text-xs flex flex-wrap gap-4 p-4">
+      <div className="absolute bottom-0 inset-x-0 text-xs flex flex-wrap gap-4 p-4 bg-red-50 m-2">
         <div className="flex flex-col gap-2 w-full max-w-[800px]">
           Graph 1
           <div className="grid grid-cols-4 gap-2">
@@ -589,8 +635,8 @@ export default function VoiceVisualizerRenderer({
           </div>
         </div>
       </div>
-      <div className="flex items-end w-full h-full p-2">
-        <svg className="w-full aspect-square border max-h-[60vh] border-gray-300 bg-white">
+      <div className="flex items-end w-full h-full">
+        <svg className="w-full aspect-square border h-full border-gray-300 bg-white">
           <defs>{gradients}</defs>
           {paths}
         </svg>

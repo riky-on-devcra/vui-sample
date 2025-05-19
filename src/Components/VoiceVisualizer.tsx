@@ -100,7 +100,7 @@ export default function VoiceVisualizer() {
   }, []);
 
   return (
-    <div>
+    <div className="w-full h-full">
       <div className="flex gap-4 mb-4">
         <button
           onClick={isRecording ? stopRecording : handleStartRecording}
@@ -113,13 +113,15 @@ export default function VoiceVisualizer() {
           {isRecording ? "녹음 중지" : "녹음 시작"}
         </button>
       </div>
-      <VoiceVisualizerRenderer
-        isRecording={isRecording}
-        analyserRef={analyserRef}
-        audioContextRef={audioContextRef}
-        isInitialized={isInitialized}
-        animationFrameRef={animationFrameRef}
-      />
+      <div className="w-[1024px] h-[1024px]">
+        <VoiceVisualizerRenderer
+          isRecording={isRecording}
+          analyserRef={analyserRef}
+          audioContextRef={audioContextRef}
+          isInitialized={isInitialized}
+          animationFrameRef={animationFrameRef}
+        />
+      </div>
     </div>
   );
 }
