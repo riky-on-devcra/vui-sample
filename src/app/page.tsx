@@ -188,6 +188,24 @@ export default function Home() {
               ipsam, eos deleniti, provident atque repellat saepe ad explicabo
               quidem voluptatum minus ex officiis dignissimos? Iste.
             </p>
+            <ol className="text-base text-stone-700 list-decimal list-inside p-1">
+              <li>
+                <a
+                  href="https://stg-account.samsung.com"
+                  target="_blank"
+                  className="text-blue-500"
+                >
+                  https://stg-account.samsung.com
+                </a>{" "}
+                에서 stg 계정으로 로그인
+              </li>
+              <li>삼성STG 계정으로 로그인이 돼있다고 가정</li>
+              <li>아래 루비콘 실행 버튼을 눌러 루비콘 실행</li>
+              <li>
+                이미 SSO가 적용돼있다면 로그인 없이 바로 루비콘 채팅 화면이
+                나와야 됨
+              </li>
+            </ol>
           </div>
           <VoiceVisualizer />
         </div>
