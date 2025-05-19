@@ -103,6 +103,7 @@ export default function VoiceVisualizer() {
     <div className="w-full h-full">
       <div className="flex gap-4 mb-4">
         <button
+          id="record-button"
           onClick={isRecording ? stopRecording : handleStartRecording}
           className={`px-4 py-2 rounded ${
             isRecording
