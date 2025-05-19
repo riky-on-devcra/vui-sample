@@ -190,6 +190,11 @@ export default function Home() {
             </p>
             <ol className="text-base text-stone-700 list-decimal list-inside p-1">
               <li>
+                <span className="font-bold">
+                  제로 이 자리는 삼성닷컴 화면이 보이게 됨
+                </span>
+              </li>
+              <li>
                 <a
                   href="https://stg-account.samsung.com"
                   target="_blank"
