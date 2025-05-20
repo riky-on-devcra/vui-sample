@@ -6,6 +6,34 @@ export default function Home() {
     <div className="grid grid-rows-[1fr] items-center justify-items-center min-h-screen font-[family-name:var(--font-geist-sans)] ">
       <main className="flex flex-1 h-full w-full items-center justify-center">
         <div className="flex flex-col">
+          <div className="flex justify-end">
+            <div
+              className="utility__button__cart noitem bg-red-200 ml-3"
+              data-name="utility__cart"
+            >
+              <button
+                className="cart__button"
+                data-di-id="di-id-8d7c0ff0-62192679"
+              >
+                <span className="sr-only">루비콘 버튼</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  data-di-res-id="4edbb2e8-bdcd088d"
+                  data-di-rand="1747725407346"
+                >
+                  <rect width="24" height="24" fill="none"></rect>
+                  <path
+                    d="M643.456,213.832a2.5,2.5,0,1,1-2.5,2.5A2.5,2.5,0,0,1,643.456,213.832Zm-8.736,0a2.5,2.5,0,1,1-2.5,2.5A2.5,2.5,0,0,1,634.72,213.832Zm8.736,1.25a1.25,1.25,0,1,0,1.25,1.25A1.25,1.25,0,0,0,643.456,215.082Zm-8.736,0a1.25,1.25,0,1,0,1.25,1.25A1.25,1.25,0,0,0,634.72,215.082Zm-6.049-17.832a.965.965,0,0,1,.9.663l.013.046.8,3.073H647.9a.806.806,0,0,1,.8.979l-.01.045-2.349,9.073a.965.965,0,0,1-.865.708l-.049,0H632.645a.967.967,0,0,1-.9-.662l-.013-.047-3.3-12.629h-2.9v-1.25Zm18.662,5.032h-16.62l2.168,8.307h12.3Z"
+                    transform="translate(-625.251 -196)"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+          </div>
           <div>
             <p className="text-xs text-gray-500">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi
