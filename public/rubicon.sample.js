@@ -2,7 +2,7 @@
   const SIDEPANEL_WIDTH = 375;
   const TRANSITION_DURATION = "0.4s";
   const TRANSITION_CURVE = "cubic-bezier(0.4, 0, 0.2, 1)";
-  const RUBICON_URL = "https://new.rubicon.dev.devcra.com";
+  const RUBICON_URL = "https://new.rubicon.dev.devcra.com/sec";
   const ORIGIN_HOST = "https://new.rubicon.dev.devcra.com";
   const RUBICON_ACTION_TYPE = "rubicon-action";
   var visible = false;
