@@ -120,7 +120,7 @@
 
     console.log(event);
 
-    const { id, actions } = event.data;
+    const { id, actions } = event.data.data;
     if (!Array.isArray(actions)) {
       console.error("[RUBICON] Invalid actions:", actions);
       return;
