@@ -73,7 +73,7 @@
       wrapper.style.zIndex = "9999";
 
       var iframe = document.createElement("iframe");
-      iframe.src = "https://dev-aibot-kr.samsunggenai.com/";
+      iframe.src = "https://new.rubicon.dev.devcra.com/";
       iframe.style.width = "100%";
       iframe.style.height = "100%";
       iframe.style.border = "none";
