@@ -2,7 +2,7 @@
   const SIDEPANEL_WIDTH = 375;
   const TRANSITION_DURATION = "0.4s";
   const TRANSITION_CURVE = "cubic-bezier(0.4, 0, 0.2, 1)";
-
+  const RUBICON_URL = "https://new.rubicon.dev.devcra.com/sec";
   var visible = false;
   var mainContent, wrapper, divider, buttonWrapper;
 
@@ -73,7 +73,7 @@
       wrapper.style.zIndex = "9999";
 
       var iframe = document.createElement("iframe");
-      iframe.src = "https://new.rubicon.dev.devcra.com/";
+      iframe.src = RUBICON_URL;
       iframe.style.width = "100%";
       iframe.style.height = "100%";
       iframe.style.border = "none";
