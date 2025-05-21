@@ -112,14 +112,19 @@
 
   window.addEventListener("message", function (event) {
     if (event.origin !== ORIGIN_HOST) return;
-    console.log(event);
+
     if (!event.data || event.data.type !== RUBICON_ACTION_TYPE) {
       console.error("[RUBICON] Invalid event data:", event.data);
       return;
     }
 
+    console.log(event);
+
     const { id, actions } = event.data;
-    if (!Array.isArray(actions)) return;
+    if (!Array.isArray(actions)) {
+      console.error("[RUBICON] Invalid actions:", actions);
+      return;
+    }
 
     console.log("[RUBICON][Action Triggered]", id, actions);
 
