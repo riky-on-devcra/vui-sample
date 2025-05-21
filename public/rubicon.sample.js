@@ -112,6 +112,7 @@
 
   window.addEventListener("message", function (event) {
     if (event.origin !== ORIGIN_HOST) return;
+    console.log(event);
     if (!event.data || event.data.type !== RUBICON_ACTION_TYPE) {
       console.error("[RUBICON] Invalid event data:", event.data);
       return;
