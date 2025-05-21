@@ -171,20 +171,8 @@
   });
 
   window.rubicon = {
-    sendRubicon: function (payload) {
-      const iframe = document
-        .getElementById("aibot-wrapper")
-        ?.querySelector("iframe");
-      if (!iframe || !iframe.contentWindow) {
-        console.warn("[Rubicon] iframe not found or not ready");
-        return;
-      }
-      iframe.contentWindow.postMessage(
-        { type: "send-message", data: payload },
-        ORIGIN_HOST
-      );
-    },
     openRubicon: function (payload) {
+      //openRubicon(initialMessage: string?)
       if (!visible) {
         const triggerButton = document.querySelector(".rubicon__button");
         if (triggerButton) triggerButton.click();
@@ -207,7 +195,17 @@
 
         observer.observe(document.body, { childList: true, subtree: true });
       } else {
-        window.rubicon.sendRubicon(payload);
+        const iframe = document
+          .getElementById("aibot-wrapper")
+          ?.querySelector("iframe");
+        if (!iframe || !iframe.contentWindow) {
+          console.warn("[Rubicon] iframe not found or not ready");
+          return;
+        }
+        iframe.contentWindow.postMessage(
+          { type: "send-message", data: payload },
+          ORIGIN_HOST
+        );
       }
     },
   };
