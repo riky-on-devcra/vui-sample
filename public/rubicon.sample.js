@@ -184,5 +184,31 @@
         ORIGIN_HOST
       );
     },
+    openRubicon: function (payload) {
+      if (!visible) {
+        const triggerButton = document.querySelector(".rubicon__button");
+        if (triggerButton) triggerButton.click();
+
+        const observer = new MutationObserver(() => {
+          const iframe = document
+            .getElementById("aibot-wrapper")
+            ?.querySelector("iframe");
+          if (iframe) {
+            iframeRef = iframe;
+            observer.disconnect();
+            iframe.onload = () => {
+              iframe.contentWindow.postMessage(
+                { type: "rubicon-response", data: payload },
+                ORIGIN_HOST
+              );
+            };
+          }
+        });
+
+        observer.observe(document.body, { childList: true, subtree: true });
+      } else {
+        window.rubicon.sendRubicon(payload);
+      }
+    },
   };
 })();
