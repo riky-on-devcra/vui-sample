@@ -112,9 +112,77 @@
 
   window.addEventListener("message", function (event) {
     if (event.origin !== ORIGIN_HOST) return;
-    console.log(event);
-    if (event && event.data && event.data.type === RUBICON_ACTION_TYPE) {
-      alert(event.data.data); // 예: "helloworld"
+    if (!event.data || event.data.type !== RUBICON_ACTION_TYPE) {
+      console.error("[RUBICON] Invalid event data:", event.data);
+      return;
+    }
+
+    const { id, actions } = event.data;
+    if (!Array.isArray(actions)) return;
+
+    console.log("[RUBICON][Action Triggered]", id, actions);
+
+    actions.forEach((act) => {
+      try {
+        switch (act.action) {
+          case "GO_TO":
+            if (act.value) {
+              window.location.href = act.value;
+            }
+            break;
+          case "CLICK": {
+            let el = act.selector ? document.querySelector(act.selector) : null;
+            if (!el && act.xpath) {
+              el = getElementByXpath(act.xpath);
+            }
+            if (el) el.click();
+            break;
+          }
+          case "SCROLL": {
+            let el = act.selector ? document.querySelector(act.selector) : null;
+            if (!el && act.xpath) {
+              el = getElementByXpath(act.xpath);
+            }
+            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+            break;
+          }
+          default:
+            console.warn("Unknown action type:", act.action);
+        }
+      } catch (e) {
+        console.error("Action failed:", act, e);
+      }
+    });
+
+    function getElementByXpath(xpath) {
+      try {
+        return document.evaluate(
+          xpath,
+          document,
+          null,
+          XPathResult.FIRST_ORDERED_NODE_TYPE,
+          null
+        ).singleNodeValue;
+      } catch (e) {
+        console.error("[RUBICON] Failed to get element by xpath:", xpath, e);
+        return null;
+      }
     }
   });
+
+  window.rubicon = {
+    sendRubicon: function (payload) {
+      const iframe = document
+        .getElementById("aibot-wrapper")
+        ?.querySelector("iframe");
+      if (!iframe || !iframe.contentWindow) {
+        console.warn("[Rubicon] iframe not found or not ready");
+        return;
+      }
+      iframe.contentWindow.postMessage(
+        { type: "send-message", data: payload },
+        ORIGIN_HOST
+      );
+    },
+  };
 })();
