@@ -186,7 +186,7 @@
             observer.disconnect();
             iframe.onload = () => {
               iframe.contentWindow.postMessage(
-                { type: "rubicon-response", data: payload },
+                { type: "send-message", data: payload },
                 ORIGIN_HOST
               );
             };
