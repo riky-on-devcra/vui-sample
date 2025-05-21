@@ -109,6 +109,7 @@
   };
 
   window.addEventListener("message", function (event) {
+    console.log(event);
     if (event && event.data && event.data.type === "rubicon-action") {
       alert(event.data.data); // 예: "helloworld"
     }
