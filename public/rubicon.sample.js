@@ -130,68 +130,6 @@
     }
   };
 
-  window.consumeRubiconActions = function (id) {
-    if (runningIds.has(id)) return;
-    const raw = localStorage.getItem(`rubicon-actions:${id}`);
-    if (!raw) return;
-    const list = JSON.parse(raw);
-    if (!list.length) return;
-
-    runningIds.add(id);
-    updateStatus(`running ${id} (${list.length})`);
-
-    const runNext = () => {
-      const current = list.shift();
-      if (!current) {
-        localStorage.removeItem(`rubicon-actions:${id}`);
-        runningIds.delete(id);
-        updateStatus("idle");
-        return;
-      }
-
-      try {
-        updateStatus(`exec ${current.action}`);
-        switch (current.action) {
-          case "GO_TO":
-            if (current.value) window.location.href = current.value;
-            break;
-          case "CLICK": {
-            let el = current.selector
-              ? document.querySelector(current.selector)
-              : null;
-            if (!el && current.xpath) el = getElementByXpath(current.xpath);
-            if (el) el.click();
-            break;
-          }
-          case "SCROLL": {
-            let el = current.selector
-              ? document.querySelector(current.selector)
-              : null;
-            if (!el && current.xpath) el = getElementByXpath(current.xpath);
-            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-            break;
-          }
-          default:
-            console.warn("Unknown action type:", current.action);
-        }
-      } catch (e) {
-        console.error("[RUBICON] Action execution failed:", e);
-      }
-
-      if (list.length > 0) {
-        localStorage.setItem(`rubicon-actions:${id}`, JSON.stringify(list));
-        setTimeout(runNext, 500);
-      } else {
-        localStorage.removeItem(`rubicon-actions:${id}`);
-        runningIds.delete(id);
-        updateStatus("done");
-        setTimeout(() => updateStatus("idle"), 1000);
-      }
-    };
-
-    runNext();
-  };
-
   function getElementByXpath(xpath) {
     try {
       return document.evaluate(
@@ -234,7 +172,7 @@
     try {
       localStorage.removeItem(`rubicon-actions:${id}`);
       localStorage.setItem(`rubicon-actions:${id}`, JSON.stringify(actions));
-      window.consumeRubiconActions(id);
+      window.rubicon.consumeActions(id);
     } catch (e) {
       console.error("[RUBICON] Failed to store or consume actions:", e);
     }
@@ -245,7 +183,7 @@
       const key = localStorage.key(i);
       if (key && key.startsWith("rubicon-actions:")) {
         const id = key.split(":")[1];
-        window.consumeRubiconActions(id);
+        window.rubicon.consumeActions(id);
       }
     }
   });
@@ -286,6 +224,104 @@
           ORIGIN_HOST
         );
       }
+    },
+    consumeActions: function (id) {
+      if (runningIds.has(id)) return;
+      const raw = localStorage.getItem(`rubicon-actions:${id}`);
+      if (!raw) return;
+      const list = JSON.parse(raw);
+      if (!list.length) return;
+
+      runningIds.add(id);
+      updateStatus(`running ${id} (${list.length})`);
+
+      const runNext = () => {
+        const current = list.shift();
+        if (!current) {
+          localStorage.removeItem(`rubicon-actions:${id}`);
+          runningIds.delete(id);
+          updateStatus("idle");
+          return;
+        }
+
+        // ✅ 먼저 localStorage에 최신 상태 반영
+        localStorage.setItem(`rubicon-actions:${id}`, JSON.stringify(list));
+
+        try {
+          updateStatus(`exec ${current.action}`);
+          switch (current.action) {
+            case "GO_TO":
+              if (current.value) {
+                setTimeout(() => {
+                  window.location.href = current.value;
+                }, 100);
+                return; // 즉시 다음 runNext 예약 안 하고 종료
+              }
+              break;
+            case "CLICK": {
+              let el = current.selector
+                ? document.querySelector(current.selector)
+                : null;
+              if (!el && current.xpath) el = getElementByXpath(current.xpath);
+              if (el) el.click();
+              break;
+            }
+            case "SCROLL": {
+              let el = current.selector
+                ? document.querySelector(current.selector)
+                : null;
+              if (!el && current.xpath) el = getElementByXpath(current.xpath);
+              if (el)
+                el.scrollIntoView({ behavior: "smooth", block: "center" });
+              break;
+            }
+            default:
+              console.warn("Unknown action type:", current.action);
+          }
+        } catch (e) {
+          console.error("[RUBICON] Action execution failed:", e);
+          updateStatus("error");
+        }
+
+        if (list.length > 0) {
+          setTimeout(runNext, 500);
+        } else {
+          localStorage.removeItem(`rubicon-actions:${id}`);
+          runningIds.delete(id);
+          updateStatus("done");
+          setTimeout(() => updateStatus("idle"), 1000);
+        }
+      };
+
+      runNext();
+    },
+    inspectActions: function () {
+      const entries = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith("rubicon-actions:")) {
+          try {
+            const actions = JSON.parse(localStorage.getItem(key));
+            entries.push({ id: key.split(":")[1], actions });
+          } catch (e) {
+            console.error("[RUBICON] Failed to parse:", key, e);
+          }
+        }
+      }
+      console.table(entries);
+    },
+    clearActions: function () {
+      const removed = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith("rubicon-actions:")) {
+          removed.push(key);
+        }
+      }
+      removed.forEach((key) => localStorage.removeItem(key));
+      console.log(`[RUBICON] Cleared ${removed.length} action(s):`, removed);
+      updateStatus("cleared");
+      setTimeout(() => updateStatus("idle"), 1000);
     },
   };
 })();
