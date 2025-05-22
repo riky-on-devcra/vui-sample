@@ -154,9 +154,6 @@
     //     actions: Array<{ action: 'CLICK' | 'SCROLL' | 'GO_TO', selector?, xpath?, value? }>
     //   }
     // }
-
-    console.log("[RUBICON] received message:", event);
-
     if (event.origin !== ORIGIN_HOST) return;
     const { type, method, args } = event.data;
 
