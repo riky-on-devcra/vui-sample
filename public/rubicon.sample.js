@@ -158,6 +158,7 @@
     if (event.origin !== ORIGIN_HOST) return;
     const { type, method, args } = event.data;
 
+    console.log("[RUBICON] received message:", event.data);
     if (
       type === "rubicon-command" &&
       typeof window.rubicon[method] === "function"
@@ -168,6 +169,7 @@
             ", "
           )})`
         );
+
         window.rubicon[method](...(args || []));
       } catch (e) {
         console.error("[RUBICON] Command failed:", method, e);
