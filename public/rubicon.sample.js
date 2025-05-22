@@ -176,8 +176,8 @@
     }
   });
 
-  window.addEventListener("DOMContentLoaded", function () {
-    console.log("[RUBICON] DOMContentLoaded");
+  function initRubicon() {
+    console.log("[RUBICON] initRubicon");
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key && key.startsWith("rubicon-actions:")) {
@@ -185,7 +185,13 @@
         window.rubicon.consumeActions(id);
       }
     }
-  });
+  }
+
+  if (document.readyState === "loading") {
+    window.addEventListener("DOMContentLoaded", initRubicon);
+  } else {
+    initRubicon();
+  }
 
   window.rubicon = {
     openRubicon: function (payload) {
