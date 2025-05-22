@@ -63,72 +63,7 @@
     observer.observe(document.body, { childList: true, subtree: true });
   }
 
-  button.onclick = function () {
-    visible = !visible;
-
-    if (visible) {
-      mainContent = document.createElement("div");
-      mainContent.id = "main-content";
-      mainContent.style.height = "100vh";
-      mainContent.style.overflowY = "auto";
-      mainContent.style.width = "calc(100% - " + SIDEPANEL_WIDTH + "px)";
-      mainContent.style.transition =
-        "width " + TRANSITION_DURATION + " " + TRANSITION_CURVE;
-      mainContent.style.position = "relative";
-
-      while (document.body.firstChild && document.body.firstChild !== wrapper) {
-        mainContent.appendChild(document.body.firstChild);
-      }
-      document.body.appendChild(mainContent);
-
-      wrapper = document.createElement("div");
-      wrapper.id = "aibot-wrapper";
-      wrapper.style.position = "fixed";
-      wrapper.style.top = "0";
-      wrapper.style.right = "0";
-      wrapper.style.height = "100vh";
-      wrapper.style.width = SIDEPANEL_WIDTH + "px";
-      wrapper.style.transform = "translateX(100%)";
-      wrapper.style.transition =
-        "transform " + TRANSITION_DURATION + " " + TRANSITION_CURVE;
-      wrapper.style.overflowY = "hidden";
-      wrapper.style.zIndex = "9999";
-
-      var iframe = document.createElement("iframe");
-      iframe.src = RUBICON_URL;
-      iframe.style.width = "100%";
-      iframe.style.height = "100%";
-      iframe.style.border = "none";
-      wrapper.appendChild(iframe);
-      document.body.appendChild(wrapper);
-
-      divider = document.createElement("div");
-      divider.id = "aibot-divider";
-      divider.style.position = "fixed";
-      divider.style.top = "0";
-      divider.style.right = SIDEPANEL_WIDTH + "px";
-      divider.style.width = "2px";
-      divider.style.height = "100vh";
-      divider.style.backgroundColor = "#ccc";
-      divider.style.zIndex = "9998";
-      document.body.appendChild(divider);
-
-      setTimeout(function () {
-        wrapper.style.transform = "translateX(0)";
-      }, 10);
-    } else {
-      wrapper.style.transform = "translateX(100%)";
-      divider.remove();
-
-      setTimeout(function () {
-        while (mainContent.firstChild) {
-          document.body.insertBefore(mainContent.firstChild, mainContent);
-        }
-        mainContent.remove();
-        wrapper.remove();
-      }, 400);
-    }
-  };
+  button.onclick = _toggleRubicon;
 
   function getElementByXpath(xpath) {
     try {
@@ -196,13 +131,80 @@
     }
   }
 
+  function _toggleRubicon() {
+    visible = !visible;
+
+    if (visible) {
+      mainContent = document.createElement("div");
+      mainContent.id = "main-content";
+      mainContent.style.height = "100vh";
+      mainContent.style.overflowY = "auto";
+      mainContent.style.width = "calc(100% - " + SIDEPANEL_WIDTH + "px)";
+      mainContent.style.transition =
+        "width " + TRANSITION_DURATION + " " + TRANSITION_CURVE;
+      mainContent.style.position = "relative";
+
+      while (document.body.firstChild && document.body.firstChild !== wrapper) {
+        mainContent.appendChild(document.body.firstChild);
+      }
+      document.body.appendChild(mainContent);
+
+      wrapper = document.createElement("div");
+      wrapper.id = "aibot-wrapper";
+      wrapper.style.position = "fixed";
+      wrapper.style.top = "0";
+      wrapper.style.right = "0";
+      wrapper.style.height = "100vh";
+      wrapper.style.width = SIDEPANEL_WIDTH + "px";
+      wrapper.style.transform = "translateX(100%)";
+      wrapper.style.transition =
+        "transform " + TRANSITION_DURATION + " " + TRANSITION_CURVE;
+      wrapper.style.overflowY = "hidden";
+      wrapper.style.zIndex = "9999";
+
+      var iframe = document.createElement("iframe");
+      iframe.src = RUBICON_URL;
+      iframe.style.width = "100%";
+      iframe.style.height = "100%";
+      iframe.style.border = "none";
+      wrapper.appendChild(iframe);
+      document.body.appendChild(wrapper);
+
+      divider = document.createElement("div");
+      divider.id = "aibot-divider";
+      divider.style.position = "fixed";
+      divider.style.top = "0";
+      divider.style.right = SIDEPANEL_WIDTH + "px";
+      divider.style.width = "2px";
+      divider.style.height = "100vh";
+      divider.style.backgroundColor = "#ccc";
+      divider.style.zIndex = "9998";
+      document.body.appendChild(divider);
+
+      setTimeout(function () {
+        wrapper.style.transform = "translateX(0)";
+      }, 10);
+    } else {
+      wrapper.style.transform = "translateX(100%)";
+      divider.remove();
+
+      setTimeout(function () {
+        while (mainContent.firstChild) {
+          document.body.insertBefore(mainContent.firstChild, mainContent);
+        }
+        mainContent.remove();
+        wrapper.remove();
+      }, 400);
+    }
+  }
+
   window.rubicon = {
-    openRubicon: function (payload) {
+    toggleRubicon: toggleRubicon,
+    openRubicon: function (initialMessage) {
       console.log("[RUBICON] openRubicon", { payload });
       //openRubicon(initialMessage: string?)
       if (!visible) {
-        const triggerButton = document.querySelector(".rubicon__button");
-        if (triggerButton) triggerButton.click();
+        _toggleRubicon();
 
         const observer = new MutationObserver(() => {
           const iframe = document
@@ -212,7 +214,7 @@
             observer.disconnect();
             iframe.onload = () => {
               iframe.contentWindow.postMessage(
-                { type: "send-message", data: payload },
+                { type: "send-message", data: initialMessage },
                 ORIGIN_HOST
               );
             };
