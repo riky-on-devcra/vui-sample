@@ -164,7 +164,9 @@
     ) {
       try {
         console.log(
-          `[RUBICON] iframe command: rubicon.${method}(${args?.join(", ")})`
+          `[RUBICON] iframe command: rubicon.${method}(${(args || []).join(
+            ", "
+          )})`
         );
         window.rubicon[method](...(args || []));
       } catch (e) {
