@@ -154,12 +154,15 @@
     //     actions: Array<{ action: 'CLICK' | 'SCROLL' | 'GO_TO', selector?, xpath?, value? }>
     //   }
     // }
-    if (event.origin !== ORIGIN_HOST) return;
+    if (!event || !event.data) return;
+    console.log("[RUBICON] received message:", event);
     const { type, method, args } = event.data;
+    if (event.origin !== ORIGIN_HOST) return;
 
     console.log("[RUBICON] received message:", event.data);
     if (
       type === "rubicon-command" &&
+      window.rubicon &&
       typeof window.rubicon[method] === "function"
     ) {
       try {
@@ -169,7 +172,11 @@
           )})`
         );
 
-        window.rubicon[method](...(args || []));
+        try {
+          window.rubicon[method](...(args || []));
+        } catch (e) {
+          console.error("[RUBICON] Execution error:", e);
+        }
       } catch (e) {
         console.error("[RUBICON] Command failed:", method, e);
       }
