@@ -266,7 +266,7 @@
       if (!list.length) return;
 
       if (!visible) {
-        _toggleRubicon();
+        _toggleRubicon(true);
       }
 
       runningIds.add(id);
