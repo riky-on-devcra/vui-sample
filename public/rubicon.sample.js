@@ -155,7 +155,7 @@
     //   }
     // }
     if (!event || !event.data) return;
-    console.log("[RUBICON] received message:", event);
+
     const { type, method, args } = event.data;
     if (event.origin !== ORIGIN_HOST) return;
 
@@ -190,6 +190,7 @@
       if (key && key.startsWith("rubicon-actions:")) {
         console.log("[RUBICON] found actions:", key);
         const id = key.split(":")[1];
+        console.log(window.rubicon);
         window.rubicon.consumeActions(id);
       }
     }
