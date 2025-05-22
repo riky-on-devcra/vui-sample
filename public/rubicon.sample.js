@@ -120,6 +120,12 @@
 
   function initRubicon() {
     console.log("[RUBICON] initRubicon");
+    const shouldOpen = localStorage.getItem("rubicon-pending-iframe") === "1";
+    if (shouldOpen && !visible) {
+      _toggleRubicon(true);
+      localStorage.removeItem("rubicon-pending-iframe");
+    }
+
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key && key.startsWith("rubicon-actions:")) {
@@ -295,7 +301,16 @@
                 ? document.querySelector(current.selector)
                 : null;
               if (!el && current.xpath) el = getElementByXpath(current.xpath);
+              const success = !!el;
               if (el) el.click();
+
+              // 마지막 CLICK 액션인 경우 iframe을 다시 열도록 플래그 설정
+              if (list.length === 0) {
+                localStorage.setItem("rubicon-pending-iframe", "1");
+              }
+              console.log(
+                `[RUBICON] CLICK action ${success ? "succeeded" : "failed"}`
+              );
               break;
             }
             case "SCROLL": {
@@ -303,8 +318,12 @@
                 ? document.querySelector(current.selector)
                 : null;
               if (!el && current.xpath) el = getElementByXpath(current.xpath);
+              const success = !!el;
               if (el)
                 el.scrollIntoView({ behavior: "smooth", block: "center" });
+              console.log(
+                `[RUBICON] SCROLL action ${success ? "succeeded" : "failed"}`
+              );
               break;
             }
             default:
