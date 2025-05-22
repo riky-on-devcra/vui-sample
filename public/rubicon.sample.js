@@ -196,12 +196,6 @@
     }
   }
 
-  if (document.readyState === "loading") {
-    window.addEventListener("DOMContentLoaded", initRubicon);
-  } else {
-    initRubicon();
-  }
-
   window.rubicon = {
     openRubicon: function (payload) {
       console.log("[RUBICON] openRubicon", { payload });
@@ -350,4 +344,10 @@
       setTimeout(() => updateStatus("idle"), 1000);
     },
   };
+
+  if (document.readyState === "loading") {
+    window.addEventListener("DOMContentLoaded", initRubicon);
+  } else {
+    initRubicon();
+  }
 })();
