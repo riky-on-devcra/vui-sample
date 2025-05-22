@@ -131,17 +131,20 @@
     }
   }
 
-  function _toggleRubicon() {
+  function _toggleRubicon(skipAnimation = false) {
     visible = !visible;
 
     if (visible) {
+      if (document.getElementById("main-content")) return;
+
       mainContent = document.createElement("div");
       mainContent.id = "main-content";
       mainContent.style.height = "100vh";
       mainContent.style.overflowY = "auto";
       mainContent.style.width = "calc(100% - " + SIDEPANEL_WIDTH + "px)";
-      mainContent.style.transition =
-        "width " + TRANSITION_DURATION + " " + TRANSITION_CURVE;
+      mainContent.style.transition = skipAnimation
+        ? "none"
+        : "width " + TRANSITION_DURATION + " " + TRANSITION_CURVE;
       mainContent.style.position = "relative";
 
       while (document.body.firstChild && document.body.firstChild !== wrapper) {
@@ -157,8 +160,9 @@
       wrapper.style.height = "100vh";
       wrapper.style.width = SIDEPANEL_WIDTH + "px";
       wrapper.style.transform = "translateX(100%)";
-      wrapper.style.transition =
-        "transform " + TRANSITION_DURATION + " " + TRANSITION_CURVE;
+      wrapper.style.transition = skipAnimation
+        ? "none"
+        : "transform " + TRANSITION_DURATION + " " + TRANSITION_CURVE;
       wrapper.style.overflowY = "hidden";
       wrapper.style.zIndex = "9999";
 
@@ -181,9 +185,13 @@
       divider.style.zIndex = "9998";
       document.body.appendChild(divider);
 
-      setTimeout(function () {
+      if (skipAnimation) {
         wrapper.style.transform = "translateX(0)";
-      }, 10);
+      } else {
+        setTimeout(function () {
+          wrapper.style.transform = "translateX(0)";
+        }, 10);
+      }
     } else {
       wrapper.style.transform = "translateX(100%)";
       divider.remove();
@@ -204,7 +212,7 @@
       console.log("[RUBICON] openRubicon", { payload });
       //openRubicon(initialMessage: string?)
       if (!visible) {
-        _toggleRubicon();
+        _toggleRubicon(true);
 
         const observer = new MutationObserver(() => {
           const iframe = document
@@ -220,6 +228,8 @@
             };
           }
         });
+
+        observer.observe(document.body, { childList: true, subtree: true });
       }
     },
 
@@ -248,6 +258,10 @@
       if (!raw) return;
       const list = JSON.parse(raw);
       if (!list.length) return;
+
+      if (!visible) {
+        _toggleRubicon();
+      }
 
       runningIds.add(id);
       updateStatus(`running ${id} (${list.length})`);
