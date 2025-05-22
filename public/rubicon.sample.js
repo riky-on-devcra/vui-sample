@@ -108,7 +108,42 @@
         );
 
         try {
-          window.rubicon[method](...(args || []));
+          const result = window.rubicon[method](...(args || []));
+          if (result instanceof Promise) {
+            result
+              .then((res) => {
+                event.source.postMessage(
+                  {
+                    type: "rubicon-response",
+                    method,
+                    requestId: event.data.requestId,
+                    result: res,
+                  },
+                  event.origin
+                );
+              })
+              .catch((err) => {
+                event.source.postMessage(
+                  {
+                    type: "rubicon-response",
+                    method,
+                    requestId: event.data.requestId,
+                    error: String(err),
+                  },
+                  event.origin
+                );
+              });
+          } else {
+            event.source.postMessage(
+              {
+                type: "rubicon-response",
+                method,
+                requestId: event.data.requestId,
+                result,
+              },
+              event.origin
+            );
+          }
         } catch (e) {
           console.error("[RUBICON] Execution error:", e);
         }
@@ -213,6 +248,42 @@
   }
 
   window.rubicon = {
+    takeSnapshot: function () {
+      return new Promise((resolve, reject) => {
+        function loadHtml2CanvasIfNeeded() {
+          return new Promise((res, rej) => {
+            if (typeof html2canvas !== "undefined") return res();
+            const script = document.createElement("script");
+            script.src =
+              "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js";
+            script.onload = res;
+            script.onerror = rej;
+            document.head.appendChild(script);
+          });
+        }
+
+        loadHtml2CanvasIfNeeded()
+          .then(() => {
+            const target =
+              document.getElementById("main-content") || document.body;
+            html2canvas(target, {
+              useCORS: true,
+              allowTaint: true,
+              logging: false,
+              windowWidth: document.documentElement.scrollWidth,
+              windowHeight: document.documentElement.scrollHeight,
+            })
+              .then((canvas) => {
+                const base64 = canvas.toDataURL("image/png");
+                resolve(base64);
+              })
+              .catch((err) => {
+                reject(err);
+              });
+          })
+          .catch(reject);
+      });
+    },
     toggleRubicon: _toggleRubicon,
     openRubicon: function (initialMessage) {
       console.log("[RUBICON] openRubicon", { payload });
