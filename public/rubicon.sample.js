@@ -188,6 +188,7 @@
 
   window.rubicon = {
     openRubicon: function (payload) {
+      console.log("[RUBICON] openRubicon", { payload });
       //openRubicon(initialMessage: string?)
       if (!visible) {
         const triggerButton = document.querySelector(".rubicon__button");
@@ -211,6 +212,7 @@
     },
 
     addActions: function (id, actions, autoRun = false) {
+      console.log("[RUBICON] addActions", { id, actions, autoRun });
       if (typeof id === "string" && Array.isArray(actions)) {
         try {
           localStorage.setItem(
@@ -228,6 +230,7 @@
     },
 
     consumeActions: function (id) {
+      console.log("[RUBICON] consumeActions", { id });
       if (runningIds.has(id)) return;
       const raw = localStorage.getItem(`rubicon-actions:${id}`);
       if (!raw) return;
@@ -310,11 +313,12 @@
           }
         }
       }
-      console.table(entries);
-      return entries;
+
+      console.log("[RUBICON] inspectActions", { entries });
     },
 
     clearActions: function () {
+      console.log("[RUBICON] clearActions");
       const removed = [];
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
