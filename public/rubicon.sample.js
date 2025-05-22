@@ -294,6 +294,8 @@
             default:
               console.warn("Unknown action type:", current.action);
           }
+
+          console.log("[RUBICON] consumed action", current.action);
         } catch (e) {
           console.error("[RUBICON] Action execution failed:", e);
           updateStatus("error");
