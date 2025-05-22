@@ -155,6 +155,8 @@
     //   }
     // }
 
+    console.log("[RUBICON] received message:", event);
+
     if (event.origin !== ORIGIN_HOST) return;
     const { type, method, args } = event.data;
 
