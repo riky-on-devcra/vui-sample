@@ -251,6 +251,8 @@
 
         localStorage.setItem(`rubicon-actions:${id}`, JSON.stringify(list));
 
+        console.log("[RUBICON] consumeActions", { current });
+
         try {
           updateStatus(`exec ${current.action}`);
           switch (current.action) {
