@@ -390,8 +390,23 @@
                 : null;
               if (!el && current.xpath) el = getElementByXpath(current.xpath);
               const success = !!el;
-              if (el)
+              if (el) {
                 el.scrollIntoView({ behavior: "smooth", block: "center" });
+                const observer = new IntersectionObserver(
+                  (entries, observer) => {
+                    const visible = entries.some(
+                      (entry) => entry.isIntersecting
+                    );
+                    if (visible) {
+                      observer.disconnect();
+                      console.log("[RUBICON] SCROLL confirmed visible");
+                      setTimeout(runNext, 200);
+                    }
+                  }
+                );
+                observer.observe(el);
+                return;
+              }
               console.log(
                 `[RUBICON] SCROLL action ${success ? "succeeded" : "failed"}`
               );
