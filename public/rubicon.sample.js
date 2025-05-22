@@ -4,7 +4,7 @@
   const TRANSITION_CURVE = "cubic-bezier(0.4, 0, 0.2, 1)";
   const RUBICON_URL = "https://enhans.new.rubicon.dev.devcra.com";
   const ORIGIN_HOST = "https://enhans.new.rubicon.dev.devcra.com";
-  const RUBICON_ACTION_TYPE = "rubicon-action";
+
   var visible = false;
   var mainContent, wrapper, divider, buttonWrapper;
   const runningIds = new Set();
@@ -156,25 +156,20 @@
     // }
 
     if (event.origin !== ORIGIN_HOST) return;
-    if (!event.data || event.data.type !== RUBICON_ACTION_TYPE) {
-      console.error("[RUBICON] Invalid event data:", event.data);
-      return;
-    }
+    const { type, method, args } = event.data;
 
-    const { id, actions } = event.data.data;
-    if (!Array.isArray(actions)) {
-      console.error("[RUBICON] Invalid actions:", actions);
-      return;
-    }
-
-    console.log("[RUBICON][Action Triggered]", id, actions);
-
-    try {
-      localStorage.removeItem(`rubicon-actions:${id}`);
-      localStorage.setItem(`rubicon-actions:${id}`, JSON.stringify(actions));
-      window.rubicon.consumeActions(id);
-    } catch (e) {
-      console.error("[RUBICON] Failed to store or consume actions:", e);
+    if (
+      type === "rubicon-command" &&
+      typeof window.rubicon[method] === "function"
+    ) {
+      try {
+        console.log(
+          `[RUBICON] iframe command: rubicon.${method}(${args?.join(", ")})`
+        );
+        window.rubicon[method](...(args || []));
+      } catch (e) {
+        console.error("[RUBICON] Command failed:", method, e);
+      }
     }
   });
 
@@ -209,22 +204,26 @@
             };
           }
         });
-
-        observer.observe(document.body, { childList: true, subtree: true });
-      } else {
-        const iframe = document
-          .getElementById("aibot-wrapper")
-          ?.querySelector("iframe");
-        if (!iframe || !iframe.contentWindow) {
-          console.warn("[Rubicon] iframe not found or not ready");
-          return;
-        }
-        iframe.contentWindow.postMessage(
-          { type: "send-message", data: payload },
-          ORIGIN_HOST
-        );
       }
     },
+
+    addActions: function (id, actions, autoRun = false) {
+      if (typeof id === "string" && Array.isArray(actions)) {
+        try {
+          localStorage.setItem(
+            `rubicon-actions:${id}`,
+            JSON.stringify(actions)
+          );
+          updateStatus(`received ${actions.length} action(s)`);
+          if (autoRun) {
+            this.consumeActions(id);
+          }
+        } catch (e) {
+          console.error("[RUBICON] Failed to store actions:", e);
+        }
+      }
+    },
+
     consumeActions: function (id) {
       if (runningIds.has(id)) return;
       const raw = localStorage.getItem(`rubicon-actions:${id}`);
@@ -244,7 +243,6 @@
           return;
         }
 
-        // ✅ 먼저 localStorage에 최신 상태 반영
         localStorage.setItem(`rubicon-actions:${id}`, JSON.stringify(list));
 
         try {
@@ -255,7 +253,7 @@
                 setTimeout(() => {
                   window.location.href = current.value;
                 }, 100);
-                return; // 즉시 다음 runNext 예약 안 하고 종료
+                return;
               }
               break;
             case "CLICK": {
@@ -295,6 +293,7 @@
 
       runNext();
     },
+
     inspectActions: function () {
       const entries = [];
       for (let i = 0; i < localStorage.length; i++) {
@@ -309,7 +308,9 @@
         }
       }
       console.table(entries);
+      return entries;
     },
+
     clearActions: function () {
       const removed = [];
       for (let i = 0; i < localStorage.length; i++) {
