@@ -199,7 +199,7 @@
   }
 
   window.rubicon = {
-    toggleRubicon: toggleRubicon,
+    toggleRubicon: _toggleRubicon,
     openRubicon: function (initialMessage) {
       console.log("[RUBICON] openRubicon", { payload });
       //openRubicon(initialMessage: string?)
