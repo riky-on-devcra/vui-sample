@@ -363,6 +363,14 @@
             if (iframe) {
               observer.disconnect();
 
+              const _sendMessage = () => {
+                console.log("[RUBICON] sending send-message:", initialMessage);
+                iframe.contentWindow?.postMessage(
+                  { type: "send-message", data: initialMessage },
+                  RubiconOrigin()
+                );
+              };
+
               if (iframe.contentWindow?.document?.readyState === "complete") {
                 console.log(
                   "[RUBICON] iframe document readyState complete – wait for ready message"
@@ -377,7 +385,7 @@
                       "[RUBICON] iframe reported ready, sending message"
                     );
                     window.removeEventListener("message", handleReady);
-                    sendMessageToIframe();
+                    _sendMessage();
                   }
                 };
 
@@ -397,10 +405,7 @@
                       console.log(
                         "[RUBICON] iframe is ready. Sending initial message"
                       );
-                      iframe.contentWindow.postMessage(
-                        { type: "send-message", data: initialMessage },
-                        RubiconOrigin()
-                      );
+                      _sendMessage();
                     }
                   };
 
