@@ -248,12 +248,19 @@
     }
   }
 
+  const rubiconConfig = window.rubiconSetting || {
+    locale: "en",
+  };
+
+  console.log("[RUBICON]", { rubiconConfig });
+
   window.rubicon = {
     getMetadata: () => {
       const currentUrl = window.location.href;
       const mainContent = document.getElementById("main-content");
       const currentHtml = mainContent ? mainContent.innerHTML : null;
       return {
+        locale, // from rubiconSetting
         currentUrl,
         currentHtml,
       };
