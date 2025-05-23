@@ -123,7 +123,7 @@
         ? "none"
         : "transform " + TRANSITION_DURATION + " " + TRANSITION_CURVE;
       wrapper.style.overflowY = "hidden";
-      wrapper.style.zIndex = "9999";
+      wrapper.style.zIndex = "2147484001";
 
       var iframe = document.createElement("iframe");
       iframe.src = RubiconEndpoint(skipAnimation);
