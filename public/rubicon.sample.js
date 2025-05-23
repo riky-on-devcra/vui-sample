@@ -358,6 +358,7 @@
             if (iframe) {
               observer.disconnect();
               iframe.onload = () => {
+                console.log("[RUBICON] iframe loaded", { initialMessage });
                 iframe.contentWindow.postMessage(
                   { type: "send-message", data: initialMessage },
                   ORIGIN_HOST
