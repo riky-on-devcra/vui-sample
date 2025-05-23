@@ -285,7 +285,8 @@
           .catch(reject);
       });
     },
-    toggleRubicon: _toggleRubicon,
+    toggleRubicon: () => _toggleRubicon(true),
+
     openRubicon: function (initialMessage) {
       console.log("[RUBICON] openRubicon", { initialMessage });
       //openRubicon(initialMessage: string?)
