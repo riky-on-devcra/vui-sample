@@ -2,7 +2,9 @@
   const SIDEPANEL_WIDTH = 375;
   const TRANSITION_DURATION = "0.4s";
   const TRANSITION_CURVE = "cubic-bezier(0.4, 0, 0.2, 1)";
-  const RUBICON_URL = "https://enhans.new.rubicon.dev.devcra.com";
+
+  const RUBICON_KO_URL = "https://enhans.new.rubicon.dev.devcra.com";
+  const RUBICON_UK_URL = "https://enhans-uk.new.rubicon.dev.devcra.com";
   const ORIGIN_HOST = "https://enhans.new.rubicon.dev.devcra.com";
 
   var visible = false;
@@ -153,8 +155,16 @@
     }
   });
 
+  function RubiconEndpoint(skipAnimation = false) {
+    const endpoint =
+      (rubiconConfig.locale === "ko" ? RUBICON_KO_URL : RUBICON_UK_URL) +
+      `${skipAnimation ? "/?skipIntro=Y" : ""}`;
+    console.log("[RUBICON] RubiconEndpoint", endpoint);
+
+    return endpoint;
+  }
   function initRubicon() {
-    console.log("[RUBICON] initRubicon");
+    console.log("[RUBICON] initRubicon", { rubiconConfig });
     const shouldOpen = localStorage.getItem("rubicon-pending-iframe") === "1";
     if (shouldOpen && !visible) {
       _toggleRubicon(true);
@@ -209,7 +219,7 @@
       wrapper.style.zIndex = "9999";
 
       var iframe = document.createElement("iframe");
-      iframe.src = RUBICON_URL + `${skipAnimation ? "/?skipIntro=Y" : ""}`;
+      iframe.src = RubiconEndpoint(skipAnimation);
       iframe.style.width = "100%";
       iframe.style.height = "100%";
       iframe.style.border = "none";
@@ -251,8 +261,6 @@
   const rubiconConfig = window.rubiconSetting || {
     locale: "en",
   };
-
-  console.log("[RUBICON]", { rubiconConfig });
 
   window.rubicon = {
     getMetadata: () => {
