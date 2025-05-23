@@ -375,8 +375,7 @@
               const handleReady = (event) => {
                 if (
                   event.data?.type === "rubicon-ready" &&
-                  iframe.contentWindow &&
-                  event.source === iframe.contentWindow
+                  event.origin === RubiconOrigin()
                 ) {
                   console.log(
                     "[RUBICON] iframe reported ready, sending message"
