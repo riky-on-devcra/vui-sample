@@ -376,10 +376,24 @@
                   console.log("[RUBICON] iframe loaded (onload)", {
                     initialMessage,
                   });
-                  iframe.contentWindow.postMessage(
-                    { type: "send-message", data: initialMessage },
-                    RubiconOrigin()
-                  );
+
+                  const handleReady = (event) => {
+                    if (
+                      event.data?.type === "rubicon-ready" &&
+                      event.source === iframe.contentWindow
+                    ) {
+                      window.removeEventListener("message", handleReady);
+                      console.log(
+                        "[RUBICON] iframe is ready. Sending initial message"
+                      );
+                      iframe.contentWindow.postMessage(
+                        { type: "send-message", data: initialMessage },
+                        RubiconOrigin()
+                      );
+                    }
+                  };
+
+                  window.addEventListener("message", handleReady);
                 };
               }
             }
