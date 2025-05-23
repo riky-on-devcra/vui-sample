@@ -2,7 +2,7 @@
   const SIDEPANEL_WIDTH = 375;
   const TRANSITION_DURATION = "0.4s";
   const TRANSITION_CURVE = "cubic-bezier(0.4, 0, 0.2, 1)";
-  const RUBICON_URL = "https://enhans.new.rubicon.dev.devcra.com/?skipIntro=Y";
+  const RUBICON_URL = "https://enhans.new.rubicon.dev.devcra.com";
   const ORIGIN_HOST = "https://enhans.new.rubicon.dev.devcra.com";
 
   var visible = false;
@@ -208,7 +208,7 @@
       wrapper.style.zIndex = "9999";
 
       var iframe = document.createElement("iframe");
-      iframe.src = RUBICON_URL;
+      iframe.src = RUBICON_URL + `${skipAnimation ? "/?skipIntro=Y" : ""}`;
       iframe.style.width = "100%";
       iframe.style.height = "100%";
       iframe.style.border = "none";
@@ -289,24 +289,26 @@
       console.log("[RUBICON] openRubicon", { payload });
       //openRubicon(initialMessage: string?)
       if (!visible) {
-        _toggleRubicon(true);
+        _toggleRubicon(initialMessage ? true : false);
 
-        const observer = new MutationObserver(() => {
-          const iframe = document
-            .getElementById("aibot-wrapper")
-            ?.querySelector("iframe");
-          if (iframe) {
-            observer.disconnect();
-            iframe.onload = () => {
-              iframe.contentWindow.postMessage(
-                { type: "send-message", data: initialMessage },
-                ORIGIN_HOST
-              );
-            };
-          }
-        });
+        if (initialMessage) {
+          const observer = new MutationObserver(() => {
+            const iframe = document
+              .getElementById("aibot-wrapper")
+              ?.querySelector("iframe");
+            if (iframe) {
+              observer.disconnect();
+              iframe.onload = () => {
+                iframe.contentWindow.postMessage(
+                  { type: "send-message", data: initialMessage },
+                  ORIGIN_HOST
+                );
+              };
+            }
+          });
 
-        observer.observe(document.body, { childList: true, subtree: true });
+          observer.observe(document.body, { childList: true, subtree: true });
+        }
       }
     },
 
