@@ -1,7 +1,8 @@
 (function () {
-  const rubiconConfig = window.rubiconSetting || {
-    locale: "en",
-    environment: "devcra", //devcra, dev, prod
+  const rubiconConfig = {
+    locale: (window.rubiconSetting && window.rubiconSetting.locale) || "en",
+    environment:
+      (window.rubiconSetting && window.rubiconSetting.environment) || "devcra",
   };
 
   const SIDEPANEL_WIDTH = 375;
@@ -215,11 +216,6 @@
     if (!event || !event.data) return;
 
     const { type, method, args } = event.data;
-
-    console.log(
-      "[RUBICON] [DEBUG] message event listener message from:",
-      event.origin
-    );
 
     if (!ALLOWED_ORIGINS.includes(event.origin)) return;
 
