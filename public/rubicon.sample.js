@@ -63,7 +63,7 @@
     observer.observe(document.body, { childList: true, subtree: true });
   }
 
-  button.onclick = _toggleRubicon;
+  button.onclick = () => _toggleRubicon(false);
 
   function getElementByXpath(xpath) {
     try {
@@ -249,7 +249,7 @@
   }
 
   window.rubicon = {
-    takeSnapshot: function () {
+    takeSnapshot: () => {
       return new Promise((resolve, reject) => {
         function loadHtml2CanvasIfNeeded() {
           return new Promise((res, rej) => {
@@ -287,7 +287,7 @@
     },
     toggleRubicon: () => _toggleRubicon(false),
 
-    openRubicon: function (initialMessage) {
+    openRubicon: (initialMessage) => {
       console.log("[RUBICON] openRubicon", { initialMessage });
       //openRubicon(initialMessage: string?)
       if (!visible) {
@@ -314,7 +314,7 @@
       }
     },
 
-    addActions: function (id, actions, autoRun = false) {
+    addActions: (id, actions, autoRun = false) => {
       console.log("[RUBICON] addActions", { id, actions, autoRun });
       if (typeof id === "string" && Array.isArray(actions)) {
         try {
@@ -332,7 +332,7 @@
       }
     },
 
-    consumeActions: function (id) {
+    consumeActions: (id) => {
       console.log("[RUBICON] consumeActions", { id });
       if (runningIds.has(id)) return;
       const raw = localStorage.getItem(`rubicon-actions:${id}`);
@@ -437,7 +437,7 @@
       runNext();
     },
 
-    inspectActions: function () {
+    inspectActions: () => {
       const entries = [];
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
@@ -454,7 +454,7 @@
       console.log("[RUBICON] inspectActions", { entries });
     },
 
-    clearActions: function () {
+    clearActions: () => {
       console.log("[RUBICON] clearActions");
       const removed = [];
       for (let i = 0; i < localStorage.length; i++) {
