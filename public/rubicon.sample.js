@@ -221,7 +221,7 @@
       event.origin
     );
 
-    if (event.origin !== RubiconOrigin()) return;
+    if (!ALLOWED_ORIGINS.includes(event.origin)) return;
 
     console.log("[RUBICON] received message:", event.data);
     if (
@@ -367,6 +367,17 @@
       //openRubicon(initialMessage: string?)
 
       const _sendMessage = () => {
+        const iframe = document
+          .getElementById("aibot-wrapper")
+          ?.querySelector("iframe");
+
+        if (!iframe) {
+          console.warn(
+            "[RUBICON] iframe not found when trying to send message"
+          );
+          return;
+        }
+
         console.log("[RUBICON] sending send-message:", initialMessage);
         iframe.contentWindow?.postMessage(
           { type: "send-message", data: initialMessage },
