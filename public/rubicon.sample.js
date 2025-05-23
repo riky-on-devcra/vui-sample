@@ -214,19 +214,24 @@
     // }
     if (!event || !event.data) return;
 
-    if (
-      event.data?.type === "rubicon-ready" &&
-      event.source === iframe.contentWindow
-    ) {
-      window.removeEventListener("message", handleReady);
-      console.log("[RUBICON] iframe is ready. Sending initial message");
-      _sendMessage();
-    }
+    // if (
+    //   event.data?.type === "rubicon-ready" &&
+    //   event.source === iframe.contentWindow
+    // ) {
+    //   window.removeEventListener("message", handleReady);
+    //   console.log("[RUBICON] iframe is ready. Sending initial message");
+    //   _sendMessage();
+    // }
 
     const { type, method, args } = event.data;
     if (event.origin !== RubiconOrigin()) return;
 
-    console.log("[RUBICON] received message:", event.data);
+    console.log(
+      "[RUBICON] received message:",
+      event.data,
+      event.source,
+      iframe.contentWindow
+    );
     if (
       type === "rubicon-command" &&
       window.rubicon &&
