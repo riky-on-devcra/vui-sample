@@ -365,12 +365,23 @@
 
               if (iframe.contentWindow?.document?.readyState === "complete") {
                 console.log(
-                  "[RUBICON] iframe already loaded – send message immediately"
+                  "[RUBICON] iframe document readyState complete – wait for ready message"
                 );
-                iframe.contentWindow.postMessage(
-                  { type: "send-message", data: initialMessage },
-                  RubiconOrigin()
-                );
+
+                const handleReady = (event) => {
+                  if (
+                    event.data?.type === "rubicon-ready" &&
+                    event.source === iframe.contentWindow
+                  ) {
+                    console.log(
+                      "[RUBICON] iframe reported ready, sending message"
+                    );
+                    window.removeEventListener("message", handleReady);
+                    sendMessageToIframe();
+                  }
+                };
+
+                window.addEventListener("message", handleReady);
               } else {
                 iframe.onload = () => {
                   console.log("[RUBICON] iframe loaded (onload)", {
