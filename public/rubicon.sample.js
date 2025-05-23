@@ -160,7 +160,9 @@
     if (rubiconConfig.locale === "ko") {
       return document.querySelector(".utility__button__rubicon");
     } else {
-      return document.querySelector(".nv00-gnb-v4__utility-cart");
+      return document.querySelector(
+        ".nv00-gnb-v4__container .nv00-gnb-v4__utility-cart"
+      );
     }
   }
 
