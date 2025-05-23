@@ -156,6 +156,14 @@
     }
   }
 
+  function _findCartButton() {
+    if (rubiconConfig.locale === "ko") {
+      return document.querySelector(".utility__button__rubicon");
+    } else {
+      return document.querySelector(".nv00-gnb-v4__utility-cart");
+    }
+  }
+
   if (rubiconConfig.environment === "devcra") {
     buttonWrapper = document.createElement("div");
     buttonWrapper.innerHTML = _renderButton();
@@ -164,7 +172,7 @@
       buttonWrapper.querySelector("button") || buttonWrapper.querySelector("a");
 
     var tryInsert = function () {
-      var targetElement = document.querySelector(".utility__button__cart");
+      var targetElement = _findCartButton();
       if (targetElement && targetElement.parentNode) {
         targetElement.parentNode.insertBefore(
           buttonWrapper.firstElementChild,
