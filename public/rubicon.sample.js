@@ -219,7 +219,7 @@
 
     if (!ALLOWED_ORIGINS.includes(event.origin)) return;
 
-    console.log("[RUBICON] received message:", event.data);
+    console.log("[RUBICON] received message:", event.origin, event.data);
     if (
       type === "rubicon-command" &&
       window.rubicon &&
