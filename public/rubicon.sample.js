@@ -167,6 +167,13 @@
     }
   }
 
+  const _sendMessage = () => {
+    console.log("[RUBICON] sending send-message:", initialMessage);
+    iframe.contentWindow?.postMessage(
+      { type: "send-message", data: initialMessage },
+      RubiconOrigin()
+    );
+  };
   if (rubiconConfig.environment === "devcra") {
     buttonWrapper = document.createElement("div");
     buttonWrapper.innerHTML = _renderButton();
@@ -206,6 +213,15 @@
     //   }
     // }
     if (!event || !event.data) return;
+
+    if (
+      event.data?.type === "rubicon-ready" &&
+      event.source === iframe.contentWindow
+    ) {
+      window.removeEventListener("message", handleReady);
+      console.log("[RUBICON] iframe is ready. Sending initial message");
+      _sendMessage();
+    }
 
     const { type, method, args } = event.data;
     if (event.origin !== RubiconOrigin()) return;
@@ -363,53 +379,15 @@
             if (iframe) {
               observer.disconnect();
 
-              const _sendMessage = () => {
-                console.log("[RUBICON] sending send-message:", initialMessage);
-                iframe.contentWindow?.postMessage(
-                  { type: "send-message", data: initialMessage },
-                  RubiconOrigin()
-                );
-              };
-
               if (iframe.contentWindow?.document?.readyState === "complete") {
                 console.log(
                   "[RUBICON] iframe document readyState complete – wait for ready message"
                 );
-
-                const handleReady = (event) => {
-                  if (
-                    event.data?.type === "rubicon-ready" &&
-                    event.source === iframe.contentWindow
-                  ) {
-                    console.log(
-                      "[RUBICON] iframe reported ready, sending message"
-                    );
-                    window.removeEventListener("message", handleReady);
-                    _sendMessage();
-                  }
-                };
-
-                window.addEventListener("message", handleReady);
               } else {
                 iframe.onload = () => {
                   console.log("[RUBICON] iframe loaded (onload)", {
                     initialMessage,
                   });
-
-                  const handleReady = (event) => {
-                    if (
-                      event.data?.type === "rubicon-ready" &&
-                      event.source === iframe.contentWindow
-                    ) {
-                      window.removeEventListener("message", handleReady);
-                      console.log(
-                        "[RUBICON] iframe is ready. Sending initial message"
-                      );
-                      _sendMessage();
-                    }
-                  };
-
-                  window.addEventListener("message", handleReady);
                 };
               }
             }
