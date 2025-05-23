@@ -10,7 +10,8 @@
 
   const RUBICON_KO_URL = "https://enhans.new.rubicon.dev.devcra.com";
   const RUBICON_UK_URL = "https://enhans-uk.new.rubicon.dev.devcra.com";
-  const ORIGIN_HOST = "https://enhans.new.rubicon.dev.devcra.com";
+  const RUBICON_KO_ORIGIN = "https://enhans.new.rubicon.dev.devcra.com";
+  const RUBICON_UK_ORIGIN = "https://enhans-uk.new.rubicon.dev.devcra.com";
 
   var visible = false;
   var mainContent, wrapper, divider, buttonWrapper;
@@ -207,7 +208,7 @@
     if (!event || !event.data) return;
 
     const { type, method, args } = event.data;
-    if (event.origin !== ORIGIN_HOST) return;
+    if (event.origin !== RubiconOrigin()) return;
 
     console.log("[RUBICON] received message:", event.data);
     if (
@@ -268,6 +269,11 @@
     }
   });
 
+  function RubiconOrigin() {
+    return rubiconConfig.locale === "ko"
+      ? RUBICON_KO_ORIGIN
+      : RUBICON_UK_ORIGIN;
+  }
   function RubiconEndpoint(skipAnimation = false) {
     const endpoint =
       (rubiconConfig.locale === "ko" ? RUBICON_KO_URL : RUBICON_UK_URL) +
@@ -361,7 +367,7 @@
                 console.log("[RUBICON] iframe loaded", { initialMessage });
                 iframe.contentWindow.postMessage(
                   { type: "send-message", data: initialMessage },
-                  ORIGIN_HOST
+                  RubiconOrigin()
                 );
               };
             }
