@@ -13,6 +13,13 @@
   const RUBICON_KO_ORIGIN = "https://enhans.new.rubicon.dev.devcra.com";
   const RUBICON_UK_ORIGIN = "https://enhans-uk.new.rubicon.dev.devcra.com";
 
+  const ALLOWED_ORIGINS = [
+    "https://enhans-uk.new.rubicon.dev.devcra.com",
+    "https://enhans.new.rubicon.dev.devcra.com",
+    "https://p6-pre-qa3.samsung.com",
+    "https://dev-www.samsung.com",
+  ];
+
   var visible = false;
   var mainContent, wrapper, divider, buttonWrapper;
   const runningIds = new Set();
@@ -208,7 +215,13 @@
     if (!event || !event.data) return;
 
     const { type, method, args } = event.data;
-    if (event.origin !== RubiconOrigin()) return;
+
+    console.log(
+      "[RUBICON] [DEBUG] message event listener message from:",
+      event.origin
+    );
+
+    if (!ALLOWED_ORIGINS.includes(event.origin)) return;
 
     console.log("[RUBICON] received message:", event.data);
     if (
@@ -380,7 +393,7 @@
 
                 if (
                   event.data?.type === "rubicon-ready" &&
-                  event.origin === RubiconOrigin()
+                  ALLOWED_ORIGINS.includes(event.origin)
                 ) {
                   console.log(
                     "[RUBICON] iframe reported ready, sending message"
