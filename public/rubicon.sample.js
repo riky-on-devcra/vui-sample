@@ -167,13 +167,6 @@
     }
   }
 
-  const _sendMessage = () => {
-    console.log("[RUBICON] sending send-message:", initialMessage);
-    iframe.contentWindow?.postMessage(
-      { type: "send-message", data: initialMessage },
-      RubiconOrigin()
-    );
-  };
   if (rubiconConfig.environment === "devcra") {
     buttonWrapper = document.createElement("div");
     buttonWrapper.innerHTML = _renderButton();
@@ -213,15 +206,6 @@
     //   }
     // }
     if (!event || !event.data) return;
-
-    // if (
-    //   event.data?.type === "rubicon-ready" &&
-    //   event.source === iframe.contentWindow
-    // ) {
-    //   window.removeEventListener("message", handleReady);
-    //   console.log("[RUBICON] iframe is ready. Sending initial message");
-    //   _sendMessage();
-    // }
 
     const { type, method, args } = event.data;
     if (event.origin !== RubiconOrigin()) return;
@@ -381,20 +365,51 @@
             const iframe = document
               .getElementById("aibot-wrapper")
               ?.querySelector("iframe");
+
             if (iframe) {
               observer.disconnect();
 
-              if (iframe.contentWindow?.document?.readyState === "complete") {
-                console.log(
-                  "[RUBICON] iframe document readyState complete – wait for ready message"
+              const _sendMessage = () => {
+                console.log("[RUBICON] sending send-message:", initialMessage);
+                iframe.contentWindow?.postMessage(
+                  { type: "send-message", data: initialMessage },
+                  RubiconOrigin()
                 );
-              } else {
-                iframe.onload = () => {
-                  console.log("[RUBICON] iframe loaded (onload)", {
-                    initialMessage,
-                  });
-                };
+              };
+
+              const handleReady = (event) => {
+                if (
+                  event.data?.type === "rubicon-ready" &&
+                  event.source === iframe.contentWindow
+                ) {
+                  console.log(
+                    "[RUBICON] iframe reported ready, sending message"
+                  );
+                  window.removeEventListener("message", handleReady);
+                  _sendMessage();
+                }
+              };
+
+              window.addEventListener("message", handleReady);
+
+              try {
+                if (iframe.contentWindow?.document?.readyState === "complete") {
+                  console.log(
+                    "[RUBICON] iframe readyState complete – awaiting rubicon-ready"
+                  );
+                  // rubicon-ready를 기다리기 위해 handleReady는 이미 등록됨
+                }
+              } catch (err) {
+                console.warn(
+                  "[RUBICON] Cross-origin access denied. Falling back to onload.",
+                  err
+                );
               }
+
+              iframe.onload = () => {
+                console.log("[RUBICON] iframe loaded (onload)");
+                // rubicon-ready를 기다리기 위해 handleReady는 이미 등록됨
+              };
             }
           });
 
