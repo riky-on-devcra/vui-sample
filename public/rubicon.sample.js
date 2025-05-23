@@ -217,7 +217,7 @@
 
     const { type, method, args } = event.data;
 
-    if (!ALLOWED_ORIGINS.includes(event.origin)) return;
+    if (!ALLOWED_RUBICON_ORIGINS.includes(event.origin)) return;
 
     console.log("[RUBICON] received message:", event.origin, event.data);
     if (
@@ -389,7 +389,7 @@
 
         if (
           event.data?.type === "rubicon-ready" &&
-          ALLOWED_RUBICON_ORIGINS.includes(event.origin)
+          ALLOWED_ORIGINS.includes(event.origin)
         ) {
           console.log("[RUBICON] iframe reported ready, sending message");
           window.removeEventListener("message", handleReady);
