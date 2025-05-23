@@ -210,12 +210,7 @@
     const { type, method, args } = event.data;
     if (event.origin !== RubiconOrigin()) return;
 
-    console.log(
-      "[RUBICON] received message:",
-      event.data,
-      event.source,
-      iframe.contentWindow
-    );
+    console.log("[RUBICON] received message:", event.data);
     if (
       type === "rubicon-command" &&
       window.rubicon &&
@@ -378,10 +373,8 @@
               };
 
               const handleReady = (event) => {
-                if (
-                  event.data?.type === "rubicon-ready" &&
-                  event.source === iframe.contentWindow
-                ) {
+                if (event.data?.type !== "rubicon-ready") return;
+                if (event.data?.type === "rubicon-ready") {
                   console.log(
                     "[RUBICON] iframe reported ready, sending message"
                   );
@@ -391,20 +384,6 @@
               };
 
               window.addEventListener("message", handleReady);
-
-              try {
-                if (iframe.contentWindow?.document?.readyState === "complete") {
-                  console.log(
-                    "[RUBICON] iframe readyState complete – awaiting rubicon-ready"
-                  );
-                  // rubicon-ready를 기다리기 위해 handleReady는 이미 등록됨
-                }
-              } catch (err) {
-                console.warn(
-                  "[RUBICON] Cross-origin access denied. Falling back to onload.",
-                  err
-                );
-              }
 
               iframe.onload = () => {
                 console.log("[RUBICON] iframe loaded (onload)");
