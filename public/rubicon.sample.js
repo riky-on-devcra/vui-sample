@@ -249,6 +249,15 @@
   }
 
   window.rubicon = {
+    getMetadata: () => {
+      const currentUrl = window.location.href;
+      const mainContent = document.getElementById("main-content");
+      const currentHtml = mainContent ? mainContent.innerHTML : null;
+      return {
+        currentUrl,
+        currentHtml,
+      };
+    },
     takeSnapshot: () => {
       return new Promise((resolve, reject) => {
         function loadHtml2CanvasIfNeeded() {
