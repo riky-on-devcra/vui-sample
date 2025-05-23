@@ -68,7 +68,7 @@
       );
     } else {
       return (
-        '<a class="nv00-gnb-v4__utility nv00-gnb-v4__utility-cart nv00-gnb-v4__utility-btn js-global-cart-btn js-has-carturl" href="#" an-tr="nv00_gnb-home-gnb cart icon-navigation6" an-ca="navigation" an-ac="gnb" an-la="cart" role="button">' +
+        '<a class="nv00-gnb-v4__utility nv00-gnb-v4__utility-rubicon nv00-gnb-v4__utility-btn js-global-rubicon-btn" href="#" an-tr="nv00_gnb-home-gnb cart icon-navigation6" an-ca="navigation" an-ac="gnb" an-la="rubicon" role="button">' +
         '<span class="hidden">Rubicon</span>' +
         '<svg width="24" height="24" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">' +
         '<g clip-path="url(#clip0_199_8102)">' +
