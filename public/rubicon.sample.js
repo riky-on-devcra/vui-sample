@@ -324,7 +324,7 @@
           );
           updateStatus(`received ${actions.length} action(s)`);
           if (autoRun) {
-            this.consumeActions(id);
+            window.rubicon.consumeActions(id);
           }
         } catch (e) {
           console.error("[RUBICON] Failed to store actions:", e);
