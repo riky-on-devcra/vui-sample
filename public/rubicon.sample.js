@@ -362,13 +362,26 @@
               ?.querySelector("iframe");
             if (iframe) {
               observer.disconnect();
-              iframe.onload = () => {
-                console.log("[RUBICON] iframe loaded", { initialMessage });
+
+              if (iframe.contentWindow?.document?.readyState === "complete") {
+                console.log(
+                  "[RUBICON] iframe already loaded – send message immediately"
+                );
                 iframe.contentWindow.postMessage(
                   { type: "send-message", data: initialMessage },
                   RubiconOrigin()
                 );
-              };
+              } else {
+                iframe.onload = () => {
+                  console.log("[RUBICON] iframe loaded (onload)", {
+                    initialMessage,
+                  });
+                  iframe.contentWindow.postMessage(
+                    { type: "send-message", data: initialMessage },
+                    RubiconOrigin()
+                  );
+                };
+              }
             }
           });
 
