@@ -173,6 +173,7 @@
   }
 
   function _toggleRubicon(skipAnimation = false) {
+    console.log("[RUBICON] _toggleRubicon", { skipAnimation });
     visible = !visible;
 
     if (visible) {
