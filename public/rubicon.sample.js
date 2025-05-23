@@ -221,7 +221,7 @@
       event.origin
     );
 
-    if (!ALLOWED_ORIGINS.includes(event.origin)) return;
+    if (event.origin !== RubiconOrigin()) return;
 
     console.log("[RUBICON] received message:", event.data);
     if (
@@ -365,10 +365,35 @@
     openRubicon: (initialMessage) => {
       console.log("[RUBICON] openRubicon", { initialMessage });
       //openRubicon(initialMessage: string?)
-      if (!visible) {
-        _toggleRubicon(initialMessage ? true : false);
 
+      const _sendMessage = () => {
+        console.log("[RUBICON] sending send-message:", initialMessage);
+        iframe.contentWindow?.postMessage(
+          { type: "send-message", data: initialMessage },
+          RubiconOrigin()
+        );
+      };
+
+      const handleReady = (event) => {
+        console.log(
+          "[RUBICON] [DEBUG] handleReady received from:",
+          event.origin
+        );
+
+        if (
+          event.data?.type === "rubicon-ready" &&
+          ALLOWED_ORIGINS.includes(event.origin)
+        ) {
+          console.log("[RUBICON] iframe reported ready, sending message");
+          window.removeEventListener("message", handleReady);
+          _sendMessage();
+        }
+      };
+
+      if (!visible) {
         if (initialMessage) {
+          window.addEventListener("message", handleReady);
+
           const observer = new MutationObserver(() => {
             const iframe = document
               .getElementById("aibot-wrapper")
@@ -376,34 +401,6 @@
 
             if (iframe) {
               observer.disconnect();
-
-              const _sendMessage = () => {
-                console.log("[RUBICON] sending send-message:", initialMessage);
-                iframe.contentWindow?.postMessage(
-                  { type: "send-message", data: initialMessage },
-                  RubiconOrigin()
-                );
-              };
-
-              const handleReady = (event) => {
-                console.log(
-                  "[RUBICON] [DEBUG] handleReady received from:",
-                  event.origin
-                );
-
-                if (
-                  event.data?.type === "rubicon-ready" &&
-                  ALLOWED_ORIGINS.includes(event.origin)
-                ) {
-                  console.log(
-                    "[RUBICON] iframe reported ready, sending message"
-                  );
-                  window.removeEventListener("message", handleReady);
-                  _sendMessage();
-                }
-              };
-
-              window.addEventListener("message", handleReady);
 
               iframe.onload = () => {
                 console.log("[RUBICON] iframe loaded (onload)");
@@ -414,6 +411,8 @@
 
           observer.observe(document.body, { childList: true, subtree: true });
         }
+
+        _toggleRubicon(initialMessage ? true : false);
       }
     },
 
