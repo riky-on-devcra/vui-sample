@@ -67,7 +67,7 @@
       );
     } else {
       return (
-        '<a class="nv00-gnb-v4__utility nv00-gnb-v4__utility-cart nv00-gnb-v4__utility-btn js-global-cart-btn js-has-carturl" data-cart-url="https://shop.samsung.com/uk/cart/" href="https://shop.samsung.com/uk/cart/" an-tr="nv00_gnb-home-gnb cart icon-navigation6" an-ca="navigation" an-ac="gnb" an-la="cart" role="button">' +
+        '<a class="nv00-gnb-v4__utility nv00-gnb-v4__utility-cart nv00-gnb-v4__utility-btn js-global-cart-btn js-has-carturl" href="#" an-tr="nv00_gnb-home-gnb cart icon-navigation6" an-ca="navigation" an-ac="gnb" an-la="cart" role="button">' +
         '<span class="hidden">Rubicon</span>' +
         '<svg width="24" height="24" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">' +
         '<g clip-path="url(#clip0_199_8102)">' +
@@ -160,7 +160,8 @@
     buttonWrapper = document.createElement("div");
     buttonWrapper.innerHTML = _renderButton();
 
-    var button = buttonWrapper.querySelector("button");
+    var button =
+      buttonWrapper.querySelector("button") || buttonWrapper.querySelector("a");
 
     var tryInsert = function () {
       var targetElement = document.querySelector(".utility__button__cart");
