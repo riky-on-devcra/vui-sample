@@ -307,7 +307,6 @@
       const mainContent = document.getElementById("main-content");
       const currentHtml = mainContent ? mainContent.innerHTML : null;
       return {
-        locale, // from rubiconSetting
         currentUrl,
         currentHtml,
       };
