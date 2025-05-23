@@ -80,6 +80,82 @@
     }
   }
 
+  function _toggleRubicon(skipAnimation = false) {
+    console.log("[RUBICON] _toggleRubicon", { skipAnimation });
+    visible = !visible;
+
+    if (visible) {
+      if (document.getElementById("main-content")) return;
+
+      mainContent = document.createElement("div");
+      mainContent.id = "main-content";
+      mainContent.style.height = "100vh";
+      mainContent.style.overflowY = "auto";
+      mainContent.style.width = "calc(100% - " + SIDEPANEL_WIDTH + "px)";
+      mainContent.style.transition = skipAnimation
+        ? "none"
+        : "width " + TRANSITION_DURATION + " " + TRANSITION_CURVE;
+      mainContent.style.position = "relative";
+
+      while (document.body.firstChild && document.body.firstChild !== wrapper) {
+        mainContent.appendChild(document.body.firstChild);
+      }
+      document.body.appendChild(mainContent);
+
+      wrapper = document.createElement("div");
+      wrapper.id = "aibot-wrapper";
+      wrapper.style.position = "fixed";
+      wrapper.style.top = "0";
+      wrapper.style.right = "0";
+      wrapper.style.height = "100vh";
+      wrapper.style.width = SIDEPANEL_WIDTH + "px";
+      wrapper.style.transform = "translateX(100%)";
+      wrapper.style.transition = skipAnimation
+        ? "none"
+        : "transform " + TRANSITION_DURATION + " " + TRANSITION_CURVE;
+      wrapper.style.overflowY = "hidden";
+      wrapper.style.zIndex = "9999";
+
+      var iframe = document.createElement("iframe");
+      iframe.src = RubiconEndpoint(skipAnimation);
+      iframe.style.width = "100%";
+      iframe.style.height = "100%";
+      iframe.style.border = "none";
+      wrapper.appendChild(iframe);
+      document.body.appendChild(wrapper);
+
+      divider = document.createElement("div");
+      divider.id = "aibot-divider";
+      divider.style.position = "fixed";
+      divider.style.top = "0";
+      divider.style.right = SIDEPANEL_WIDTH + "px";
+      divider.style.width = "2px";
+      divider.style.height = "100vh";
+      divider.style.backgroundColor = "#ccc";
+      divider.style.zIndex = "9998";
+      document.body.appendChild(divider);
+
+      if (skipAnimation) {
+        wrapper.style.transform = "translateX(0)";
+      } else {
+        setTimeout(function () {
+          wrapper.style.transform = "translateX(0)";
+        }, 10);
+      }
+    } else {
+      wrapper.style.transform = "translateX(100%)";
+      divider.remove();
+
+      setTimeout(function () {
+        while (mainContent.firstChild) {
+          document.body.insertBefore(mainContent.firstChild, mainContent);
+        }
+        mainContent.remove();
+        wrapper.remove();
+      }, 400);
+    }
+  }
+
   if (rubiconConfig.environment === "devcra") {
     buttonWrapper = document.createElement("div");
     buttonWrapper.innerHTML = _renderButton();
@@ -205,82 +281,6 @@
         console.log(window.rubicon);
         window.rubicon.consumeActions(id);
       }
-    }
-  }
-
-  function _toggleRubicon(skipAnimation = false) {
-    console.log("[RUBICON] _toggleRubicon", { skipAnimation });
-    visible = !visible;
-
-    if (visible) {
-      if (document.getElementById("main-content")) return;
-
-      mainContent = document.createElement("div");
-      mainContent.id = "main-content";
-      mainContent.style.height = "100vh";
-      mainContent.style.overflowY = "auto";
-      mainContent.style.width = "calc(100% - " + SIDEPANEL_WIDTH + "px)";
-      mainContent.style.transition = skipAnimation
-        ? "none"
-        : "width " + TRANSITION_DURATION + " " + TRANSITION_CURVE;
-      mainContent.style.position = "relative";
-
-      while (document.body.firstChild && document.body.firstChild !== wrapper) {
-        mainContent.appendChild(document.body.firstChild);
-      }
-      document.body.appendChild(mainContent);
-
-      wrapper = document.createElement("div");
-      wrapper.id = "aibot-wrapper";
-      wrapper.style.position = "fixed";
-      wrapper.style.top = "0";
-      wrapper.style.right = "0";
-      wrapper.style.height = "100vh";
-      wrapper.style.width = SIDEPANEL_WIDTH + "px";
-      wrapper.style.transform = "translateX(100%)";
-      wrapper.style.transition = skipAnimation
-        ? "none"
-        : "transform " + TRANSITION_DURATION + " " + TRANSITION_CURVE;
-      wrapper.style.overflowY = "hidden";
-      wrapper.style.zIndex = "9999";
-
-      var iframe = document.createElement("iframe");
-      iframe.src = RubiconEndpoint(skipAnimation);
-      iframe.style.width = "100%";
-      iframe.style.height = "100%";
-      iframe.style.border = "none";
-      wrapper.appendChild(iframe);
-      document.body.appendChild(wrapper);
-
-      divider = document.createElement("div");
-      divider.id = "aibot-divider";
-      divider.style.position = "fixed";
-      divider.style.top = "0";
-      divider.style.right = SIDEPANEL_WIDTH + "px";
-      divider.style.width = "2px";
-      divider.style.height = "100vh";
-      divider.style.backgroundColor = "#ccc";
-      divider.style.zIndex = "9998";
-      document.body.appendChild(divider);
-
-      if (skipAnimation) {
-        wrapper.style.transform = "translateX(0)";
-      } else {
-        setTimeout(function () {
-          wrapper.style.transform = "translateX(0)";
-        }, 10);
-      }
-    } else {
-      wrapper.style.transform = "translateX(100%)";
-      divider.remove();
-
-      setTimeout(function () {
-        while (mainContent.firstChild) {
-          document.body.insertBefore(mainContent.firstChild, mainContent);
-        }
-        mainContent.remove();
-        wrapper.remove();
-      }, 400);
     }
   }
 
