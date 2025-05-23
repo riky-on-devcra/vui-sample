@@ -373,6 +373,11 @@
               };
 
               const handleReady = (event) => {
+                console.log(
+                  "[RUBICON] [DEBUG] handleReady received from:",
+                  event.origin
+                );
+
                 if (
                   event.data?.type === "rubicon-ready" &&
                   event.origin === RubiconOrigin()
