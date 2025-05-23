@@ -158,7 +158,7 @@
 
   function _findCartButton() {
     if (rubiconConfig.locale === "ko") {
-      return document.querySelector(".utility__button__rubicon");
+      return document.querySelector(".utility__button__cart");
     } else {
       return document.querySelector(
         ".nv00-gnb-v4__container .nv00-gnb-v4__utility-cart"
