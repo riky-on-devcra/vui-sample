@@ -286,7 +286,7 @@
     },
     toggleRubicon: _toggleRubicon,
     openRubicon: function (initialMessage) {
-      console.log("[RUBICON] openRubicon", { payload });
+      console.log("[RUBICON] openRubicon", { initialMessage });
       //openRubicon(initialMessage: string?)
       if (!visible) {
         _toggleRubicon(initialMessage ? true : false);
@@ -424,14 +424,12 @@
           updateStatus("error");
         }
 
-        if (list.length > 0) {
-          setTimeout(runNext, 500);
-        } else {
-          localStorage.removeItem(`rubicon-actions:${id}`);
-          runningIds.delete(id);
-          updateStatus("done");
-          setTimeout(() => updateStatus("idle"), 1000);
-        }
+        if (list.length > 0) return setTimeout(runNext, 500);
+
+        localStorage.removeItem(`rubicon-actions:${id}`);
+        runningIds.delete(id);
+        updateStatus("done");
+        setTimeout(() => updateStatus("idle"), 1000);
       };
 
       runNext();
