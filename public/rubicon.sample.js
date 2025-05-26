@@ -19,26 +19,16 @@
     ...ALLOWED_RUBICON_ORIGINS,
     "https://p6-pre-qa3.samsung.com",
     "https://dev-www.samsung.com",
+    "https://stg-www.samsung.com",
+    "https://stg2-www.samsung.com",
+    "https://dev-familynet.samsung.com",
+    "https://dev-www.familynet.kr",
+    "https://samsung.com",
   ];
 
   var visible = false;
   var mainContent, wrapper, divider, buttonWrapper;
   const runningIds = new Set();
-
-  const statusBox = document.createElement("div");
-  statusBox.id = "rubicon-status-box";
-  statusBox.style.position = "fixed";
-  statusBox.style.bottom = "10px";
-  statusBox.style.left = "10px";
-  statusBox.style.padding = "8px 12px";
-  statusBox.style.backgroundColor = "rgba(0,0,0,0.8)";
-  statusBox.style.color = "white";
-  statusBox.style.fontSize = "12px";
-  statusBox.style.fontFamily = "monospace";
-  statusBox.style.borderRadius = "6px";
-  statusBox.style.zIndex = "10000";
-  statusBox.textContent = "[RUBICON] idle";
-  document.body.appendChild(statusBox);
 
   function updateStatus(text) {
     if (statusBox) statusBox.textContent = `[RUBICON] ${text}`;
@@ -310,6 +300,23 @@
     }
   }
 
+  const _sendMessage = (message) => {
+    const iframe = document
+      .getElementById("aibot-wrapper")
+      ?.querySelector("iframe");
+
+    if (!iframe) {
+      console.warn("[RUBICON] iframe not found when trying to send message");
+      return;
+    }
+
+    console.log("[RUBICON] sending send-message:", message);
+    iframe.contentWindow?.postMessage(
+      { type: "send-message", data: message },
+      RubiconOrigin()
+    );
+  };
+
   window.rubicon = {
     getMetadata: () => {
       const currentUrl = window.location.href;
@@ -362,25 +369,6 @@
       console.log("[RUBICON] openRubicon", { initialMessage });
       //openRubicon(initialMessage: string?)
 
-      const _sendMessage = () => {
-        const iframe = document
-          .getElementById("aibot-wrapper")
-          ?.querySelector("iframe");
-
-        if (!iframe) {
-          console.warn(
-            "[RUBICON] iframe not found when trying to send message"
-          );
-          return;
-        }
-
-        console.log("[RUBICON] sending send-message:", initialMessage);
-        iframe.contentWindow?.postMessage(
-          { type: "send-message", data: initialMessage },
-          RubiconOrigin()
-        );
-      };
-
       const handleReady = (event) => {
         if (
           event.data?.type === "rubicon-ready" &&
@@ -388,7 +376,7 @@
         ) {
           console.log("[RUBICON] iframe reported ready, sending message");
           window.removeEventListener("message", handleReady);
-          _sendMessage();
+          _sendMessage(initialMessage);
         }
       };
 
@@ -415,6 +403,18 @@
         }
 
         _toggleRubicon(initialMessage ? true : false);
+      }
+    },
+
+    canAskRubicon: () => {
+      if (visible) {
+        return true;
+      }
+      return false;
+    },
+    askRubicon: (message) => {
+      if (window.rubicon.canAskRubicon()) {
+        _sendMessage(message);
       }
     },
 
