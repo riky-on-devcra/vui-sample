@@ -30,10 +30,6 @@
   var mainContent, wrapper, divider, buttonWrapper;
   const runningIds = new Set();
 
-  function updateStatus(text) {
-    if (statusBox) statusBox.textContent = `[RUBICON] ${text}`;
-  }
-
   function getElementByXpath(xpath) {
     try {
       return document.evaluate(
@@ -426,7 +422,7 @@
             `rubicon-actions:${id}`,
             JSON.stringify(actions)
           );
-          updateStatus(`received ${actions.length} action(s)`);
+
           if (autoRun) {
             window.rubicon.consumeActions(id);
           }
@@ -449,23 +445,23 @@
       }
 
       runningIds.add(id);
-      updateStatus(`running ${id} (${list.length})`);
 
       const runNext = () => {
         const current = list.shift();
         if (!current) {
           localStorage.removeItem(`rubicon-actions:${id}`);
           runningIds.delete(id);
-          updateStatus("idle");
+
           return;
         }
 
         localStorage.setItem(`rubicon-actions:${id}`, JSON.stringify(list));
 
-        console.log("[RUBICON] consumeActions", { current });
+        if (_satellite.cookie.get("guid_1_") === "ss2e708wmj") {
+          alert("[RUBICON] consumeActions", { current });
+        }
 
         try {
-          updateStatus(`exec ${current.action}`);
           switch (current.action) {
             case "GO_TO":
               if (current.value) {
@@ -476,6 +472,9 @@
               }
               break;
             case "CLICK": {
+              if (_satellite.cookie.get("guid_1_") === "ss2e708wmj") {
+                debugger;
+              }
               let el = current.selector
                 ? document.querySelector(current.selector)
                 : null;
@@ -487,9 +486,11 @@
               if (list.length === 0) {
                 localStorage.setItem("rubicon-pending-iframe", "1");
               }
-              console.log(
-                `[RUBICON] CLICK action ${success ? "succeeded" : "failed"}`
-              );
+              if (_satellite.cookie.get("guid_1_") === "ss2e708wmj") {
+                alert(
+                  `[RUBICON] CLICK action ${success ? "succeeded" : "failed"}`
+                );
+              }
               break;
             }
             case "SCROLL": {
@@ -527,21 +528,21 @@
           console.log("[RUBICON] consumed action", current.action);
         } catch (e) {
           console.error("[RUBICON] Action execution failed:", e);
-          updateStatus("error");
         }
 
         if (list.length > 0) return setTimeout(runNext, 500);
 
         localStorage.removeItem(`rubicon-actions:${id}`);
         runningIds.delete(id);
-        updateStatus("done");
-        setTimeout(() => updateStatus("idle"), 1000);
       };
 
       runNext();
     },
 
     inspectActions: () => {
+      if (_satellite.cookie.get("guid_1_") !== "ss2e708wmj") {
+        debugger;
+      }
       const entries = [];
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
@@ -555,7 +556,12 @@
         }
       }
 
-      console.log("[RUBICON] inspectActions", { entries });
+      // console.log("[RUBICON] inspectActions", { entries });
+      if (_satellite.cookie.get("guid_1_") === "ss2e708wmj") {
+        alert(
+          "[RUBICON] inspectActions:\n\n" + JSON.stringify(entries, null, 2)
+        );
+      }
     },
 
     clearActions: () => {
@@ -569,8 +575,6 @@
       }
       removed.forEach((key) => localStorage.removeItem(key));
       console.log(`[RUBICON] Cleared ${removed.length} action(s):`, removed);
-      updateStatus("cleared");
-      setTimeout(() => updateStatus("idle"), 1000);
     },
   };
 
